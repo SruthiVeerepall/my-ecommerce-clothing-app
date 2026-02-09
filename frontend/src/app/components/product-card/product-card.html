@@ -1,0 +1,6 @@
+<div class="product-card">
+  <img *ngIf="product?.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
+  <h2>{{ product?.name }}</h2>
+  <p>${{ product?.price }}</p>
+  <button (click)="onAddToCart()">Add to Cart</button>
+</div>

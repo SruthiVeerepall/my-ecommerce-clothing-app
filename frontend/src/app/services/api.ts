@@ -1,0 +1,56 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class Api {
+  private apiUrl = 'http://localhost:8080/api';
+
+  constructor(private http: HttpClient) {}
+
+  // Products
+  getProducts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/products`);
+  }
+
+  getProduct(id: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/products/${id}`);
+  }
+
+  // Cart
+  getCart(userId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/cart/${userId}`);
+  }
+
+  addToCart(cartItem: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/cart/add`, cartItem);
+  }
+
+  removeFromCart(itemId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/cart/remove/${itemId}`);
+  }
+
+  checkout(userId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/cart/checkout/${userId}`, {});
+  }
+
+  // Orders
+  getOrders(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/orders`);
+  }
+
+  createOrder(order: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/orders`, order);
+  }
+
+  // Auth
+  register(user: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/register`, user);
+  }
+
+  login(credentials: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
+  }
+}
