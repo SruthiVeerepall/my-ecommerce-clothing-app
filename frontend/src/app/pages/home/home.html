@@ -9,25 +9,46 @@
   <div class="hero-image">[Hero Banner - Big Image]</div>
 </section>
 
+<div *ngIf="successMessage" class="alert alert-success">
+  {{ successMessage }}
+</div>
+
 <section class="featured-products">
+  <div style="display:none">Debug: {{products.length}} items loaded</div>
   <h2>Featured Products</h2>
-  <div class="products-grid">
-    <div class="product-card">
-      <div class="placeholder-image">Shirt Image</div>
-      <h3>Shirt</h3>
+  
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Searching for the latest trends...</p>
+    <small style="color: #636e72; display: block; margin-top: 10px;">If this takes too long, please ensure your Backend server is running.</small>
+  </div>
+
+  <div class="products-grid" *ngIf="!loading && products.length > 0">
+    <div class="product-card" *ngFor="let product of products; trackBy: trackByProductId">
+      <div class="product-image-container">
+        <img [src]="product.imageUrl" 
+             [alt]="product.name" 
+             *ngIf="product.imageUrl"
+             loading="lazy"
+             decoding="async">
+        <div class="placeholder-image" *ngIf="!product.imageUrl">{{ product.name.charAt(0) }}</div>
+      </div>
+      <div class="product-info">
+        <h3>{{ product.name }}</h3>
+        <p class="category">{{ product.category }}</p>
+        <p class="description">{{ product.description }}</p>
+        <div class="price-action">
+          <span class="price">${{ product.price }}</span>
+          <button class="btn add-to-cart" (click)="addToCart(product)">
+            🛒 Add to Cart
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="product-card">
-      <div class="placeholder-image">Dress Image</div>
-      <h3>Dress</h3>
-    </div>
-    <div class="product-card">
-      <div class="placeholder-image">Jacket Image</div>
-      <h3>Jacket</h3>
-    </div>
-    <div class="product-card">
-      <div class="placeholder-image">Shoes Image</div>
-      <h3>Shoes</h3>
-    </div>
+  </div>
+
+  <div *ngIf="!loading && products.length === 0" class="empty-state">
+    <p>Check back soon for our new collection!</p>
   </div>
 </section>
 

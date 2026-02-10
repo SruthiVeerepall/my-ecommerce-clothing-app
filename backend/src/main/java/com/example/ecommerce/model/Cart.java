@@ -5,6 +5,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Column;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 
 @Entity
 public class Cart {
@@ -15,6 +17,10 @@ public class Cart {
 
     @Column(name = "user_id", nullable = false)
     private Long userId;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product;
 
     @Column(name = "product_id", nullable = false)
     private Long productId;
@@ -47,6 +53,14 @@ public class Cart {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public Long getProductId() {

@@ -36,6 +36,7 @@ export class AuthService {
       tap((response: any) => {
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('token', response.jwt);
+          localStorage.setItem('role', response.role || 'USER');
           // Extract user ID from token or make a separate call
           // For now, we'll use a default user ID
           localStorage.setItem('userId', '1');
@@ -49,11 +50,19 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
+      localStorage.removeItem('role');
       this.isAuthenticatedSubject.next(false);
     }
   }
 
   isAuthenticated(): boolean {
     return this.isAuthenticatedSubject.value;
+  }
+
+  isAdmin(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('role') === 'ADMIN';
+    }
+    return false;
   }
 }

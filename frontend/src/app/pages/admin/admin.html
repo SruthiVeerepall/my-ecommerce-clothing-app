@@ -1,0 +1,137 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>🛍️ Admin Dashboard</h1>
+    <button class="btn-back" (click)="goBack()">← Back to Store</button>
+  </div>
+
+  <div class="admin-content">
+    <!-- Add/Edit Product Form -->
+    <div class="form-section">
+      <h2>{{ editMode ? 'Edit Product' : 'Add New Product' }}</h2>
+      
+      <form (ngSubmit)="onSubmit()" #productForm="ngForm" class="admin-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Product Name *</label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              [(ngModel)]="product.name" 
+              required 
+              placeholder="e.g., Red Floral Dress">
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category *</label>
+            <select id="category" name="category" [(ngModel)]="product.category" required>
+              <option value="Dresses">Dresses</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Footwear">Footwear</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea 
+            id="description" 
+            name="description" 
+            [(ngModel)]="product.description" 
+            required 
+            rows="3"
+            placeholder="Enter product description..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Price ($) *</label>
+          <input 
+            type="number" 
+            id="price" 
+            name="price" 
+            [(ngModel)]="product.price" 
+            required 
+            min="0" 
+            step="0.01"
+            placeholder="0.00">
+        </div>
+
+        <div class="form-group">
+          <label for="imageFile">Product Image *</label>
+          <div class="file-upload-container">
+            <input 
+              type="file" 
+              id="imageFile" 
+              name="imageFile" 
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="file-input"
+              #fileInput>
+            <button type="button" class="btn-upload" (click)="fileInput.click()">
+              📁 Choose Image from Device
+            </button>
+            <span class="file-name" *ngIf="imagePreview">Image selected ✓</span>
+          </div>
+          <small class="hint">💡 Supported formats: JPG, PNG, WEBP. Max size: 5MB</small>
+        </div>
+
+        <!-- Image Preview -->
+        <div class="image-preview-section" *ngIf="imagePreview">
+          <label>Image Preview:</label>
+          <div class="image-preview">
+            <img [src]="imagePreview" [alt]="product.name || 'Preview'">
+            <button type="button" class="btn-remove-image" (click)="removeImage()" title="Remove image">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="loading || !productForm.form.valid || (!product.imageUrl && products.length > 0)" class="btn btn-primary">
+            {{ loading ? 'Saving...' : (editMode ? 'Update Product' : 'Add Product') }}
+          </button>
+          <button type="button" *ngIf="editMode" (click)="resetForm()" class="btn btn-secondary">
+            Cancel Edit
+          </button>
+        </div>
+      </form>
+
+      <div *ngIf="successMessage" class="alert alert-success">
+        ✓ {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-error">
+        ✗ {{ errorMessage }}
+      </div>
+    </div>
+
+    <!-- Products List -->
+    <div class="products-section">
+      <h2>📦 All Products ({{ products.length }})</h2>
+      
+      <div *ngIf="loadingProducts" class="loading">Loading products...</div>
+      
+      <div class="products-grid" *ngIf="!loadingProducts">
+        <div class="product-item" *ngFor="let p of products">
+          <div class="product-image">
+            <img [src]="p.imageUrl" [alt]="p.name" (error)="$event.target.src = '/assets/placeholder.png'">
+          </div>
+          <div class="product-info">
+            <h3>{{ p.name }}</h3>
+            <p class="category">{{ p.category }}</p>
+            <p class="description">{{ p.description }}</p>
+            <p class="price">${{ p.price }}</p>
+          </div>
+          <div class="product-actions">
+            <button class="btn-edit" (click)="editProduct(p)">✏️ Edit</button>
+            <button class="btn-delete" (click)="deleteProduct(p.id!)">🗑️ Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingProducts && products.length === 0" class="no-products">
+        <p>No products yet. Add your first product above!</p>
+      </div>
+    </div>
+  </div>
+</div>

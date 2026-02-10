@@ -5,9 +5,10 @@ INSERT INTO products (id, name, description, price, category, imageUrl) VALUES
 (4, 'Sneakers', 'Casual sneakers for everyday wear', 59.99, 'Footwear', 'sneakers.jpg'),
 (5, 'Hat', 'Stylish baseball cap', 15.99, 'Accessories', 'hat.jpg');
 
-INSERT INTO users (id, username, password, email) VALUES
-(1, 'john_doe', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'john@example.com'),
-(2, 'jane_smith', '$2a$10$8K2GzVtX8nO6tYvJcH8Ue.4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'jane@example.com');
+INSERT INTO users (id, username, password, email, role) VALUES
+(1, 'john_doe', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'john@example.com', 'USER'),
+(2, 'jane_smith', '$2a$10$8K2GzVtX8nO6tYvJcH8Ue.4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'jane@example.com', 'USER'),
+(3, 'admin', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin@example.com', 'ADMIN');
 
 INSERT INTO orders (id, user_id, total_amount, order_date, status) VALUES
 (1, 1, 69.98, '2023-10-01', 'PENDING'),

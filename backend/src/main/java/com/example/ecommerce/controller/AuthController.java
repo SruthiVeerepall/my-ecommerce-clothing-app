@@ -50,20 +50,31 @@ public class AuthController {
 
         final UserDetails userDetails = userService.loadUserByUsername(identifier);
         final String jwt = jwtUtil.generateToken(userDetails);
+        
+        String role = "USER";
+        if (userDetails instanceof User) {
+            role = ((User) userDetails).getRole();
+        }
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, role));
     }
 
     // Inner class for response
     public static class AuthenticationResponse {
         private final String jwt;
+        private final String role;
 
-        public AuthenticationResponse(String jwt) {
+        public AuthenticationResponse(String jwt, String role) {
             this.jwt = jwt;
+            this.role = role;
         }
 
         public String getJwt() {
             return jwt;
+        }
+
+        public String getRole() {
+            return role;
         }
     }
 }

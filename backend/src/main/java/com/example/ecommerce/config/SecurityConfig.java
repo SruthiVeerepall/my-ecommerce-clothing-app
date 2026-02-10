@@ -3,6 +3,7 @@ package com.example.ecommerce.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,7 +42,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable()
             .authorizeRequests()
             .antMatchers("/api/auth/**").permitAll()
-            .antMatchers("/api/products/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+            .antMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+            .antMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+            .antMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

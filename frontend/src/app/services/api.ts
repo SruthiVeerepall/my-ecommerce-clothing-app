@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, timeout } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -12,11 +12,29 @@ export class Api {
 
   // Products
   getProducts(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/products`);
+    return this.http.get<any[]>(`${this.apiUrl}/products`).pipe(
+      timeout(30000) // 30 second timeout
+    );
   }
 
   getProduct(id: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/products/${id}`);
+  }
+
+  createProduct(product: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/products`, product).pipe(
+      timeout(60000) // 60 second timeout for large image uploads
+    );
+  }
+
+  updateProduct(id: number, product: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/products/${id}`, product).pipe(
+      timeout(60000) // 60 second timeout for large image uploads
+    );
+  }
+
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/products/${id}`);
   }
 
   // Cart

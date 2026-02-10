@@ -30,7 +30,9 @@ export class Login {
     this.errorMessage = '';
 
     this.authService.login(this.credentials).subscribe({
-      next: () => {
+      next: (response) => {
+        console.log('Login response:', response); // Debug log
+        console.log('Role stored:', localStorage.getItem('role')); // Debug log
         this.router.navigate(['/']);
       },
       error: (error) => {
