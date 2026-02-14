@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Api } from '../../services/api';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 
 interface Product {
   id?: number;
@@ -21,6 +22,9 @@ interface Product {
   styleUrl: './admin.css',
 })
 export class Admin implements OnInit {
+  @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild('productForm') productForm!: NgForm;
+
   product: Product = {
     name: '',
     description: '',
@@ -148,47 +152,47 @@ export class Admin implements OnInit {
     this.loading = true;
     this.successMessage = '';
     this.errorMessage = '';
+    
     console.log('Sending product data...', { ...this.product, imageUrl: this.product.imageUrl?.substring(0, 50) + '...' });
+
+    const productData = { ...this.product };
 
     if (this.editMode && this.editingProductId) {
       // Update existing product
-      this.api.updateProduct(this.editingProductId, this.product).subscribe({
-        next: (response) => {
+      this.api.updateProduct(this.editingProductId, productData)
+        .pipe(finalize(() => {
           this.loading = false;
-          this.successMessage = '✅ Product updated successfully!';
-          this.resetForm();
-          this.loadProducts();
-          setTimeout(() => this.successMessage = '', 8000);
-        },
-        error: (err) => {
-          this.loading = false;
-          this.errorMessage = 'Failed to update product. Please try again.';
-          console.error(err);
-        }
-      });
+        }))
+        .subscribe({
+          next: (response) => {
+            this.successMessage = '✅ Product updated successfully!';
+            this.resetForm();
+            this.loadProducts();
+            setTimeout(() => this.successMessage = '', 5000);
+          },
+          error: (err) => {
+            this.errorMessage = 'Failed to update product. Please try again.';
+            console.error(err);
+          }
+        });
     } else {
       // Create new product
-      this.api.createProduct(this.product).subscribe({
-        next: (response) => {
-          console.log('✅ Product created successfully:', response);
+      this.api.createProduct(productData)
+        .pipe(finalize(() => {
           this.loading = false;
-          this.successMessage = '✅ Product added successfully! Reloading list...';
-          console.log('Resetting form...');
-          this.resetForm();
-          console.log('Loading all products...');
-          this.loadProducts();
-          // Clear success message after 8 seconds (longer so user can see it)
-          setTimeout(() => {
-            this.successMessage = '';
-            console.log('Success message cleared');
-          }, 8000);
-        },
-        error: (err) => {
-          console.error('❌ Create error:', err);
-          this.loading = false;
-          this.errorMessage = err.error?.message || 'Failed to add product. Please try again or check the console for details.';
-        }
-      });
+        }))
+        .subscribe({
+          next: (response) => {
+            this.successMessage = '✅ Product added successfully!';
+            this.resetForm();
+            this.loadProducts();
+            setTimeout(() => this.successMessage = '', 5000);
+          },
+          error: (err) => {
+            console.error('❌ Create error:', err);
+            this.errorMessage = err.error?.message || 'Failed to add product. Please try again.';
+          }
+        });
     }
   }
 
@@ -206,7 +210,7 @@ export class Admin implements OnInit {
         next: () => {
           this.successMessage = '🗑️ Product deleted successfully!';
           this.loadProducts();
-          setTimeout(() => this.successMessage = '', 8000);
+          setTimeout(() => this.successMessage = '', 5000);
         },
         error: (err) => {
           this.errorMessage = 'Failed to delete product.';
@@ -217,6 +221,12 @@ export class Admin implements OnInit {
   }
 
   resetForm() {
+    if (this.productForm) {
+      this.productForm.resetForm({
+        category: 'Dresses'
+      });
+    }
+    
     this.product = {
       name: '',
       description: '',
@@ -227,6 +237,11 @@ export class Admin implements OnInit {
     this.imagePreview = '';
     this.editMode = false;
     this.editingProductId = undefined;
+    
+    // Clear the file input element manually
+    if (this.fileInput && this.fileInput.nativeElement) {
+      this.fileInput.nativeElement.value = '';
+    }
   }
 
   goBack() {

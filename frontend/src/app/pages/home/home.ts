@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ export class Home implements OnInit {
   successMessage = '';
 
   constructor(
-    private api: Api, 
+    private api: Api,
+    private cartService: CartService,
     private cdr: ChangeDetectorRef,
     private zone: NgZone
   ) {}
@@ -70,9 +72,22 @@ export class Home implements OnInit {
     };
 
     this.api.addToCart(cartItem).subscribe({
-      next: () => {
-        this.successMessage = `✅ ${product.name} added to cart!`;
-        setTimeout(() => this.successMessage = '', 5000);
+      next: (response) => {
+        // Use the response which now includes product details
+        const itemName = response.product?.name || product.name;
+        this.successMessage = `✅ Product "${itemName}" added to cart successfully!`;
+        this.cdr.markForCheck();
+        
+        setTimeout(() => {
+          this.successMessage = '';
+          this.cdr.markForCheck();
+        }, 4000);
+        
+        // Update cart count after a delay to prevent change detection conflicts
+        setTimeout(() => {
+          const quantity = cartItem.quantity || 1;
+          this.cartService.incrementCartCount(quantity);
+        }, 0);
       },
       error: (err) => {
         console.error('Error adding to cart:', err);

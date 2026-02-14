@@ -3,10 +3,10 @@
     <img src="clothing-image.jpeg" alt="VR Boutique Logo" class="logo-img">
   </div>
   <nav class="nav">
-    <a href="#" class="nav-link">Home</a>
-    <a href="#" class="nav-link">Shop</a>
-    <a href="#" class="nav-link">About</a>
-    <a href="#" class="nav-link">Contact</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Home</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Shop</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">About</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Contact</a>
   </nav>
   <div class="actions">
     <button class="btn admin-btn" *ngIf="isAdmin" (click)="navigateToAdmin()" title="Admin Panel">⚙️ Admin</button>
@@ -14,7 +14,10 @@
       <input type="text" placeholder="Search...">
       <button class="search-btn">🔍</button>
     </div>
-    <button class="btn cart-btn" (click)="navigateToCart()">🛒</button>
+    <button class="btn cart-btn" (click)="navigateToCart()">
+      🛒
+      <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+    </button>
     <button class="btn" *ngIf="!isAuthenticated" (click)="navigateToLogin()">[Login]</button>
     <button class="btn" *ngIf="isAuthenticated" (click)="logout()">Logout</button>
   </div>

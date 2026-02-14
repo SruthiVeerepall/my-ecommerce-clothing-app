@@ -97,11 +97,11 @@
         </div>
       </form>
 
-      <div *ngIf="successMessage" class="alert alert-success">
-        ✓ {{ successMessage }}
+      <div *ngIf="successMessage" class="toast success">
+        {{ successMessage }}
       </div>
-      <div *ngIf="errorMessage" class="alert alert-error">
-        ✗ {{ errorMessage }}
+      <div *ngIf="errorMessage" class="toast error">
+        {{ errorMessage }}
       </div>
     </div>
 

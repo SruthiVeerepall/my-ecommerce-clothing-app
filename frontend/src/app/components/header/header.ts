@@ -1,10 +1,12 @@
 import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
@@ -12,10 +14,12 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 export class Header implements OnInit {
   isAuthenticated = false;
   isAdmin = false;
+  cartCount = 0;
 
   constructor(
-    private authService: AuthService, 
-    private router: Router,
+    private authService: AuthService,
+    private cartService: CartService,
+    public router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
     private cdr: ChangeDetectorRef
   ) {}
@@ -36,6 +40,13 @@ export class Header implements OnInit {
         console.log('Header subscribe - isAuth:', isAuth, 'isAdmin:', this.isAdmin, 'role:', localStorage.getItem('role')); // Debug log
         this.cdr.detectChanges(); // Force change detection
       }
+    });
+
+    // Subscribe to cart count changes
+    this.cartService.cartCount$.subscribe(count => {
+      this.cartCount = count;
+      // Schedule change detection rather than running immediately
+      this.cdr.markForCheck();
     });
   }
 

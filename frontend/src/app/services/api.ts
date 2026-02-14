@@ -46,6 +46,10 @@ export class Api {
     return this.http.post<any>(`${this.apiUrl}/cart/add`, cartItem);
   }
 
+  updateCartItemQuantity(itemId: number, quantity: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/cart/update/${itemId}`, { quantity });
+  }
+
   removeFromCart(itemId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/cart/remove/${itemId}`);
   }

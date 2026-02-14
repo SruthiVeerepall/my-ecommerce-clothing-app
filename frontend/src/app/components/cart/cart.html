@@ -1,7 +1,17 @@
 <div class="cart-container">
+  <div *ngIf="successMessage && successMessage.includes('✅')" class="toast success">
+    {{ successMessage }}
+  </div>
+  <div *ngIf="successMessage && successMessage.includes('❌')" class="toast error">
+    {{ successMessage }}
+  </div>
   <div class="cart-header">
     <h1>🛍️ Your Shopping Cart</h1>
     <button class="btn-back" (click)="goBack()">← Back to Shopping</button>
+  </div>
+
+  <div style="background: #eee; padding: 5px; font-size: 10px; text-align: center;">
+    Debug: Items={{cartItems.length}}, Loading={{loading}}
   </div>
 
   <div *ngIf="loading" class="loading-state">
@@ -20,20 +30,26 @@
     <div class="cart-items">
       <div class="cart-item" *ngFor="let item of cartItems">
         <div class="item-image">
-          <img [src]="item.product?.imageUrl" [alt]="item.product?.name" *ngIf="item.product?.imageUrl">
-          <div class="placeholder-img" *ngIf="!item.product?.imageUrl">{{ item.product?.name?.charAt(0) }}</div>
+          <img [src]="item.product.imageUrl" [alt]="item.product.name" *ngIf="item.product && item.product.imageUrl">
+          <div class="placeholder-img" *ngIf="!item.product || !item.product.imageUrl">{{ item.product?.name?.charAt(0) || '?' }}</div>
         </div>
         <div class="item-details">
-          <h3>{{ item.product?.name }}</h3>
-          <p class="category">{{ item.product?.category }}</p>
+          <h3>{{ item.product?.name || 'Unknown Product' }}</h3>
+          <p class="category">{{ item.product?.category || 'No Category' }}</p>
           <div class="quantity-controls">
             <span class="qty-label">Quantity:</span>
-            <span class="qty-value">{{ item.quantity }}</span>
+            <div class="qty-adjuster">
+              <button class="qty-btn" (click)="updateQuantity(item, -1)" [disabled]="item.quantity <= 1">−</button>
+              <span class="qty-value">{{ item.quantity }}</span>
+              <button class="qty-btn" (click)="updateQuantity(item, 1)">+</button>
+            </div>
           </div>
         </div>
         <div class="item-price-section">
-          <p class="unit-price">${{ item.product?.price }} Each</p>
-          <p class="subtotal-price">${{ (item.product?.price || 0) * (item.quantity || 1) }}</p>
+          <p class="unit-price" *ngIf="item.product">${{ item.product.price }} Each</p>
+          <p class="unit-price" *ngIf="!item.product">Price N/A</p>
+          <p class="subtotal-price" *ngIf="item.product">${{ (item.product.price || 0) * (item.quantity || 1) }}</p>
+          <p class="subtotal-price" *ngIf="!item.product">$0.00</p>
           <button class="btn-remove" (click)="removeItem(item.id)" title="Remove item">
             🗑️ Remove
           </button>

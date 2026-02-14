@@ -1,3 +1,6 @@
+<div *ngIf="successMessage" class="toast success">
+  {{ successMessage }}
+</div>
 <div *ngIf="loading">Loading...</div>
 <div *ngIf="!loading && product">
   <h2>{{ product.name }}</h2>

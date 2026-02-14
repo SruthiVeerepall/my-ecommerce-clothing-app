@@ -35,4 +35,8 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
+
+    public boolean adminExists() {
+        return userRepository.countByRole("ADMIN") > 0;
+    }
 }

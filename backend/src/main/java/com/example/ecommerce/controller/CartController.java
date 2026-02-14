@@ -27,6 +27,12 @@ public class CartController {
         return ResponseEntity.ok(addedItem);
     }
 
+    @PutMapping("/update/{itemId}")
+    public ResponseEntity<Cart> updateCartItemQuantity(@PathVariable Long itemId, @RequestBody Cart cartItem) {
+        Cart updatedItem = cartService.updateCartItemQuantity(itemId, cartItem.getQuantity());
+        return ResponseEntity.ok(updatedItem);
+    }
+
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<Void> removeItemFromCart(@PathVariable Long itemId) {
         cartService.removeItemFromCart(itemId);

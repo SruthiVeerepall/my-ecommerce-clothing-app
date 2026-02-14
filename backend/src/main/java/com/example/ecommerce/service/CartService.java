@@ -30,17 +30,35 @@ public class CartService {
     public Cart addItemToCart(Cart cartItem) {
         Optional<Cart> existingItem = cartRepository.findByUserIdAndProductId(cartItem.getUserId(), cartItem.getProductId());
         
+        Cart savedItem;
         if (existingItem.isPresent()) {
             Cart item = existingItem.get();
             item.setQuantity(item.getQuantity() + cartItem.getQuantity());
-            return cartRepository.save(item);
+            savedItem = cartRepository.save(item);
         } else {
-            return cartRepository.save(cartItem);
+            savedItem = cartRepository.save(cartItem);
         }
+        
+        // Manually reload the item with its product details to satisfy "added with all details"
+        return cartRepository.findById(savedItem.getId()).orElse(savedItem);
     }
 
     public void removeItemFromCart(Long itemId) {
         cartRepository.deleteById(itemId);
+    }
+
+    public Cart updateCartItemQuantity(Long itemId, Integer newQuantity) {
+        Optional<Cart> cartItem = cartRepository.findById(itemId);
+        if (cartItem.isPresent()) {
+            Cart item = cartItem.get();
+            if (newQuantity <= 0) {
+                cartRepository.deleteById(itemId);
+                return null;
+            }
+            item.setQuantity(newQuantity);
+            return cartRepository.save(item);
+        }
+        return null;
     }
 
     public void checkout(Long userId) {
