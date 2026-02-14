@@ -101,13 +101,7 @@ export class Cart implements OnInit {
   }
 
   checkout() {
-    if (!isPlatformBrowser(this.platformId)) return;
-    
-    const userId = +(localStorage.getItem('userId') || '1');
-    this.api.checkout(userId).subscribe(() => {
-      alert('Checkout complete');
-      this.loadCart();
-    });
+    this.router.navigate(['/checkout']);
   }
 
   get totalAmount() {

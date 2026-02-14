@@ -1,1 +1,133 @@
-<p>checkout works!</p>
+<div class="checkout-container">
+  <h2>Checkout</h2>
+
+  <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+    <div class="checkout-grid">
+      <!-- User Details -->
+      <div class="checkout-section">
+        <h3>Personal Information</h3>
+        <div formGroupName="personalInfo" class="form-grid">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input id="firstName" formControlName="firstName" type="text" placeholder="First Name">
+            <small *ngIf="checkoutForm.get('personalInfo.firstName')?.touched && checkoutForm.get('personalInfo.firstName')?.invalid" class="error">
+              First name is required
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <input id="lastName" formControlName="lastName" type="text" placeholder="Last Name">
+            <small *ngIf="checkoutForm.get('personalInfo.lastName')?.touched && checkoutForm.get('personalInfo.lastName')?.invalid" class="error">
+              Last name is required
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" formControlName="email" type="email" placeholder="Email Address">
+            <small *ngIf="checkoutForm.get('personalInfo.email')?.touched && checkoutForm.get('personalInfo.email')?.invalid" class="error">
+              Valid email is required
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input id="phone" formControlName="phone" type="text" placeholder="Phone Number">
+            <small *ngIf="checkoutForm.get('personalInfo.phone')?.touched && checkoutForm.get('personalInfo.phone')?.invalid" class="error">
+              Phone is required
+            </small>
+          </div>
+        </div>
+
+        <h3>Shipping Address</h3>
+        <div formGroupName="shippingAddress" class="form-grid full-width">
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input id="address" formControlName="address" type="text" placeholder="Shipping Address">
+            <small *ngIf="checkoutForm.get('shippingAddress.address')?.touched && checkoutForm.get('shippingAddress.address')?.invalid" class="error">
+              Address is required
+            </small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="city">City</label>
+              <input id="city" formControlName="city" type="text" placeholder="City">
+            </div>
+            <div class="form-group">
+              <label for="state">State</label>
+              <input id="state" formControlName="state" type="text" placeholder="State">
+            </div>
+            <div class="form-group">
+              <label for="zipCode">Zip Code</label>
+              <input id="zipCode" formControlName="zipCode" type="text" placeholder="Zip">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Details -->
+      <div class="checkout-section">
+        <h3>Payment Information</h3>
+        <div formGroupName="paymentInfo" class="form-grid">
+          <div class="form-group full-width selector">
+            <label>Card Type</label>
+            <div class="radio-group">
+              <label><input type="radio" formControlName="cardType" value="credit"> Credit Card</label>
+              <label><input type="radio" formControlName="cardType" value="debit"> Debit Card</label>
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="cardHolder">Card Holder Name</label>
+            <input id="cardHolder" formControlName="cardHolder" type="text" placeholder="Name on Card">
+            <small *ngIf="checkoutForm.get('paymentInfo.cardHolder')?.touched && checkoutForm.get('paymentInfo.cardHolder')?.invalid" class="error">
+              Card holder name is required
+            </small>
+          </div>
+          <div class="form-group full-width">
+            <label for="cardNumber">Card Number</label>
+            <div class="card-input-wrapper">
+              <input id="cardNumber" formControlName="cardNumber" type="text" placeholder="1234123412341234" maxlength="16">
+              <div class="card-icon" [ngClass]="detectedCardType.toLowerCase().replace(' ', '-')" *ngIf="detectedCardType && detectedCardType !== 'Unknown'">
+              </div>
+            </div>
+            <small *ngIf="checkoutForm.get('paymentInfo.cardNumber')?.touched && checkoutForm.get('paymentInfo.cardNumber')?.invalid" class="error">
+              Valid 16-digit card number is required
+            </small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiry">Expiry (MM/YY)</label>
+              <input id="expiry" formControlName="expiryDate" type="text" placeholder="MM/YY" maxlength="5">
+              <small *ngIf="checkoutForm.get('paymentInfo.expiryDate')?.touched && checkoutForm.get('paymentInfo.expiryDate')?.invalid" class="error">
+                MM/YY required
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input id="cvv" formControlName="cvv" type="password" placeholder="CVV" maxlength="4">
+              <small *ngIf="checkoutForm.get('paymentInfo.cvv')?.touched && checkoutForm.get('paymentInfo.cvv')?.invalid" class="error">
+                3-4 digits
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+          <div class="summary-items">
+            <div *ngFor="let item of cartItems" class="summary-item">
+              <span>{{ item.product?.name || item.productName || 'Product' }} x {{ item.quantity }}</span>
+              <span>{{ ((item.product?.price || item.price || 0) * (item.quantity || 0)) | currency }}</span>
+            </div>
+          </div>
+          <div class="summary-total">
+            <span>Total</span>
+            <span>{{ total | currency }}</span>
+          </div>
+          <button type="submit" class="place-order-btn" [disabled]="isSubmitting">
+            {{ isSubmitting ? 'Processing...' : ('Place Order ' + (total | currency)) }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
