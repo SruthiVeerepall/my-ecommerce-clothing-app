@@ -25,30 +25,34 @@
 
 .hero-image {
   flex: 1;
-  background: rgba(255, 255, 255, 0.2);
+  background: transparent;
   border-radius: 20px;
-  height: 400px;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px dashed rgba(0,0,0,0.1);
   font-size: 1.5rem;
   color: #636e72;
   backdrop-filter: blur(5px);
+  overflow: hidden;
 }
 
 .hero-product-carousel {
   width: 100%;
-  height: 100%;
+  height: auto;
   position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 20px;
 }
 
 .hero-carousel-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 500px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   border-radius: 20px;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
   transition: transform 0.5s ease;
@@ -296,4 +300,37 @@
 .newsletter input {
   padding: 0.5rem;
   margin-right: 0.5rem;
+}
+
+/* Responsive adjustements */
+@media (max-width: 992px) {
+  .hero {
+    flex-direction: column;
+    padding: 3rem 1.5rem;
+    text-align: center;
+  }
+
+  .hero-content {
+    padding-right: 0;
+    margin-bottom: 3rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero-buttons {
+    justify-content: center;
+  }
+
+  .hero-image {
+    width: 100%;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
 }
