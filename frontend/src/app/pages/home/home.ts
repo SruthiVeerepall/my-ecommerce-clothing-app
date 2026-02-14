@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Api } from '../../services/api';
 import { CartService } from '../../services/cart.service';
@@ -10,10 +10,13 @@ import { CartService } from '../../services/cart.service';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   products: any[] = [];
   loading = false;
   successMessage = '';
+  heroProduct: any = null;
+  currentHeroIndex = 0;
+  carouselInterval: any;
 
   constructor(
     private api: Api,
@@ -42,6 +45,7 @@ export class Home implements OnInit {
           console.log('Home: Success! Received products:', data.length);
           this.products = data;
           this.loading = false;
+          this.startCarousel();
           
           // Force a UI refresh cycle
           this.cdr.markForCheck();
@@ -110,4 +114,48 @@ export class Home implements OnInit {
       }
     });
   }
+
+  startCarousel() {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+
+    if (this.products.length === 0) {
+      this.heroProduct = null;
+      return;
+    }
+
+    this.currentHeroIndex = 0;
+    const firstProduct = this.products[0];
+    this.heroProduct = firstProduct ? { ...firstProduct } : null;
+    this.cdr.markForCheck();
+
+    this.carouselInterval = setInterval(() => {
+      this.zone.run(() => {
+        if (this.products.length === 0) {
+          return;
+        }
+
+        this.currentHeroIndex = (this.currentHeroIndex + 1) % this.products.length;
+        const nextProduct = this.products[this.currentHeroIndex];
+        this.heroProduct = nextProduct ? { ...nextProduct } : null;
+        this.cdr.markForCheck();
+      });
+    }, 3000);
+  }
+
+  onImageLoad() {
+    console.log('Hero image loaded successfully');
+  }
+
+  onImageError(url: string) {
+    console.warn('Hero image failed to load', url);
+  }
+
+  ngOnDestroy() {
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
+  }
+
 }

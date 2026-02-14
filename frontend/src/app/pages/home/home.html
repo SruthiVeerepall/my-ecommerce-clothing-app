@@ -6,7 +6,19 @@
       <button class="btn secondary">Featured Collection</button>
     </div>
   </div>
-  <div class="hero-image">[Hero Banner - Big Image]</div>
+  <div class="hero-image">
+    <div *ngIf="!loading && heroProduct" class="hero-product-carousel">
+       <img class="hero-carousel-image"
+         [src]="heroProduct.imageUrl"
+           [alt]="heroProduct.name"
+           loading="lazy"
+           (load)="onImageLoad()"
+           (error)="onImageError(heroProduct?.imageUrl)">
+    </div>
+    <div *ngIf="loading || !heroProduct" class="hero-loading">
+      <p>Loading featured products...</p>
+    </div>
+  </div>
 </section>
 
 <div *ngIf="successMessage" class="alert alert-success">
