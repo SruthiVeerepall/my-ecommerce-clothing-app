@@ -73,14 +73,29 @@ export class Home implements OnInit {
 
     this.api.addToCart(cartItem).subscribe({
       next: (response) => {
+        console.log('Add to cart response:', response);
         // Use the response which now includes product details
         const itemName = response.product?.name || product.name;
-        this.successMessage = `✅ Product "${itemName}" added to cart successfully!`;
-        this.cdr.markForCheck();
         
+        // Show success message immediately in Angular zone
+        this.zone.run(() => {
+          this.successMessage = `✅ Product "${itemName}" added to cart successfully!`;
+          console.log('Success message set:', this.successMessage);
+          
+          // Force immediate change detection
+          this.cdr.detectChanges();
+          
+          // Verify the message is displaying
+          console.log('successMessage should now be visible in UI');
+        });
+        
+        // Clear message after 4 seconds
         setTimeout(() => {
-          this.successMessage = '';
-          this.cdr.markForCheck();
+          this.zone.run(() => {
+            this.successMessage = '';
+            this.cdr.detectChanges();
+            console.log('Success message cleared');
+          });
         }, 4000);
         
         // Update cart count after a delay to prevent change detection conflicts
