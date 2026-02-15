@@ -3,6 +3,7 @@ package com.example.ecommerce.model;
 import java.util.Collection;
 import java.util.Collections;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,7 +21,13 @@ public class User implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    
+    @Column(unique = true, nullable = false)
     private String email;
+    
+    @Column(name = "email_verified", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean emailVerified = false;
+    
     private String role = "USER"; // Default role
 
     public User() {
@@ -63,6 +70,14 @@ public class User implements UserDetails {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public String getRole() {

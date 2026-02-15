@@ -1,0 +1,76 @@
+<div class="help-container">
+  <!-- Hero Section -->
+  <section class="help-hero">
+    <div class="help-hero-content">
+      <h1>Help & Support</h1>
+      <p class="tagline">Find answers to your questions and get the support you need</p>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="help-faq">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-grid">
+      <div class="faq-card" *ngFor="let faq of faqs">
+        <div class="faq-icon">{{ faq.icon }}</div>
+        <h3>{{ faq.question }}</h3>
+        <p>{{ faq.answer }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="help-contact">
+    <div class="contact-content">
+      <h2>Still Need Help?</h2>
+      <p class="contact-subtitle">Our customer support team is here to assist you</p>
+      
+      <div class="contact-methods">
+        <div class="contact-card" *ngFor="let method of contactMethods">
+          <div class="contact-icon">{{ method.icon }}</div>
+          <h3>{{ method.title }}</h3>
+          <p class="contact-detail">{{ method.detail }}</p>
+          <p class="contact-description">{{ method.description }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Tips Section -->
+  <section class="help-tips">
+    <div class="tips-content">
+      <h2>Quick Shopping Tips</h2>
+      <div class="tips-grid">
+        <div class="tip-item">
+          <span class="tip-number">1</span>
+          <h3>Create an Account</h3>
+          <p>Register to track orders, save favorites, and enjoy faster checkout</p>
+        </div>
+        <div class="tip-item">
+          <span class="tip-number">2</span>
+          <h3>Check Size Charts</h3>
+          <p>Always refer to our detailed size guides for the perfect fit</p>
+        </div>
+        <div class="tip-item">
+          <span class="tip-number">3</span>
+          <h3>Read Product Details</h3>
+          <p>Check fabric, care instructions, and product descriptions carefully</p>
+        </div>
+        <div class="tip-item">
+          <span class="tip-number">4</span>
+          <h3>Save Your Favorites</h3>
+          <p>Add items to your wishlist for easy access later</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Call to Action -->
+  <section class="help-cta">
+    <div class="cta-content">
+      <h2>Ready to Shop?</h2>
+      <p>Explore our beautiful collection of Indian ethnic wear</p>
+      <button class="btn primary" onclick="window.location.href='/'">Start Shopping</button>
+    </div>
+  </section>
+</div>

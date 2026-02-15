@@ -3,10 +3,10 @@
     <img src="clothing-image.jpeg" alt="VR Boutique Logo" class="logo-img">
   </div>
   <nav class="nav">
-    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Home</a>
-    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Shop</a>
-    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">About</a>
-    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">Contact</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">🏠 Home</a>
+    <a (click)="router.navigate(['/'])" class="nav-link" style="cursor: pointer;">🛍️ Shop</a>
+    <a (click)="router.navigate(['/about'])" class="nav-link" style="cursor: pointer;">ℹ️ About</a>
+    <a (click)="router.navigate(['/help'])" class="nav-link" style="cursor: pointer;">🎧 Help</a>
   </nav>
   <div class="actions">
     <button class="btn admin-btn" *ngIf="isAdmin" (click)="navigateToAdmin()" title="Admin Panel">⚙️ Admin</button>

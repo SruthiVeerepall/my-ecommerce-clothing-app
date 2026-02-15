@@ -19,6 +19,9 @@ ALTER TABLE product MODIFY COLUMN image_url LONGTEXT NULL;
 -- Update the column to support large base64 images
 ALTER TABLE product MODIFY COLUMN image_url LONGTEXT NOT NULL;
 
+-- Fix for email_verified field in user table
+ALTER TABLE user MODIFY COLUMN email_verified BOOLEAN DEFAULT FALSE;
+
 -- Verify the change worked
 DESCRIBE product;
 
