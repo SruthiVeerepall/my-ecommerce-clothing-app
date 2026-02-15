@@ -1,0 +1,171 @@
+<div class="shop-container">
+  <!-- Top Bar -->
+  <div class="shop-header">
+    <div class="container">
+      <div class="header-content">
+        <div class="shop-title">
+          <h1>Shop Our Collection</h1>
+          <p class="subtitle">Discover the finest Indian ethnic wear</p>
+        </div>
+        <div class="results-info">
+          <p>Showing {{ filteredProducts.length }} of {{ allProducts.length }} products</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="shop-layout">
+      <!-- Filters Sidebar -->
+      <aside class="filters-sidebar" [class.show]="showFilters">
+        <div class="filters-header">
+          <h2>Filters</h2>
+          <button class="btn-clear" (click)="clearFilters()">Clear All</button>
+        </div>
+
+        <!-- Search -->
+        <div class="filter-section">
+          <label class="filter-label">Search</label>
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Search products..." 
+            [(ngModel)]="searchQuery"
+            (input)="onFilterChange()"
+          />
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-section">
+          <label class="filter-label">Category</label>
+          <select class="filter-select" [(ngModel)]="selectedCategory" (change)="onFilterChange()">
+            <option value="all">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+        </div>
+
+        <!-- Size Filter -->
+        <div class="filter-section">
+          <label class="filter-label">Size</label>
+          <select class="filter-select" [(ngModel)]="selectedSize" (change)="onFilterChange()">
+            <option value="all">All Sizes</option>
+            <option *ngFor="let size of sizes" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+
+        <!-- Color Filter -->
+        <div class="filter-section">
+          <label class="filter-label">Color</label>
+          <div class="color-options">
+            <button 
+              *ngFor="let color of colors" 
+              class="color-btn" 
+              [class.active]="selectedColor === color"
+              [style.background-color]="color.toLowerCase()"
+              [title]="color"
+              (click)="selectedColor = color; onFilterChange()"
+            ></button>
+            <button 
+              class="color-btn all-colors" 
+              [class.active]="selectedColor === 'all'"
+              title="All Colors"
+              (click)="selectedColor = 'all'; onFilterChange()"
+            >All</button>
+          </div>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div class="filter-section">
+          <label class="filter-label">
+            Price Range: ₹{{ currentPriceRange.min }} - ₹{{ currentPriceRange.max }}
+          </label>
+          <div class="price-inputs">
+            <input 
+              type="number" 
+              class="price-input" 
+              placeholder="Min" 
+              [(ngModel)]="currentPriceRange.min"
+              (change)="onPriceRangeChange()"
+            />
+            <span>-</span>
+            <input 
+              type="number" 
+              class="price-input" 
+              placeholder="Max" 
+              [(ngModel)]="currentPriceRange.max"
+              (change)="onPriceRangeChange()"
+            />
+          </div>
+        </div>
+
+        <!-- Occasion Filter -->
+        <div class="filter-section">
+          <label class="filter-label">Occasion</label>
+          <select class="filter-select" [(ngModel)]="selectedOccasion" (change)="onFilterChange()">
+            <option value="all">All Occasions</option>
+            <option *ngFor="let occasion of occasions" [value]="occasion">{{ occasion }}</option>
+          </select>
+        </div>
+      </aside>
+
+      <!-- Products Grid -->
+      <main class="products-section">
+        <!-- Toolbar -->
+        <div class="products-toolbar">
+          <button class="btn-toggle-filters" (click)="toggleFilters()">
+            {{ showFilters ? 'Hide' : 'Show' }} Filters
+          </button>
+          <div class="sort-section">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select" class="sort-select" [(ngModel)]="sortBy" (change)="onSortChange()">
+              <option *ngFor="let option of sortOptions" [value]="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading products...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && filteredProducts.length === 0" class="empty-state">
+          <h3>No products found</h3>
+          <p>Try adjusting your filters or search query</p>
+          <button class="btn btn-primary" (click)="clearFilters()">Clear Filters</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="!isLoading && filteredProducts.length > 0" class="products-grid">
+          <div *ngFor="let product of filteredProducts" class="product-card">
+            <div class="product-image" (click)="viewProduct(product.id)">
+              <img [src]="product.imageUrl" [alt]="product.name" />
+              <div class="product-overlay">
+                <button class="btn-quick-view" (click)="viewProduct(product.id); $event.stopPropagation()">
+                  Quick View
+                </button>
+              </div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-name" (click)="viewProduct(product.id)">{{ product.name }}</h3>
+              <p class="product-category">{{ product.category }}</p>
+              <div class="product-details">
+                <div class="product-rating" *ngIf="product.rating">
+                  <span class="stars">{{ '★'.repeat(product.rating) }}{{ '☆'.repeat(5 - product.rating) }}</span>
+                </div>
+                <p class="product-price">₹{{ product.price }}</p>
+              </div>
+              <button class="btn btn-primary btn-add-cart" (click)="addToCart(product)">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>

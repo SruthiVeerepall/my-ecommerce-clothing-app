@@ -1,9 +1,10 @@
 <section class="hero">
   <div class="hero-content">
-    <h1>Welcome to VR Boutique</h1>
+    <h1>Discover Timeless Elegance</h1>
+    <p class="hero-subtitle">Festive & Wedding Collection 2026</p>
     <div class="hero-buttons">
-      <button class="btn primary">Shop Now</button>
-      <button class="btn secondary">Featured Collection</button>
+      <button class="btn primary" (click)="navigateToShop()">Explore Collection</button>
+      <button class="btn secondary" (click)="router.navigate(['/about'])">Our Story</button>
     </div>
   </div>
   <div class="hero-image">
@@ -21,22 +22,35 @@
   </div>
 </section>
 
+<!-- Success Message -->
 <div *ngIf="successMessage" class="alert alert-success">
   {{ successMessage }}
 </div>
 
+<!-- Shop by Category -->
+<section class="shop-by-category">
+  <h2>Shop by Category</h2>
+  <div class="category-grid">
+    <div class="category-card" *ngFor="let category of categories" (click)="navigateToCategory(category.name)">
+      <div class="category-icon">{{ category.icon }}</div>
+      <h3>{{ category.name }}</h3>
+      <p>{{ category.count }} Items</p>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Preview -->
 <section class="featured-products">
-  <div style="display:none">Debug: {{products.length}} items loaded</div>
-  <h2>Featured Products</h2>
+  <h2>Featured Collection</h2>
+  <p class="section-subtitle">Handpicked styles just for you</p>
   
   <div *ngIf="loading" class="loading-state">
     <div class="spinner"></div>
     <p>Searching for the latest trends...</p>
-    <small style="color: #636e72; display: block; margin-top: 10px;">If this takes too long, please ensure your Backend server is running.</small>
   </div>
 
-  <div class="products-grid" *ngIf="!loading && products.length > 0">
-    <div class="product-card" *ngFor="let product of products; trackBy: trackByProductId">
+  <div class="products-grid" *ngIf="!loading && featuredProducts.length > 0">
+    <div class="product-card" *ngFor="let product of featuredProducts; trackBy: trackByProductId">
       <div class="product-image-container">
         <img [src]="product.imageUrl" 
              [alt]="product.name" 
@@ -48,40 +62,76 @@
       <div class="product-info">
         <h3>{{ product.name }}</h3>
         <p class="category">{{ product.category }}</p>
-        <p class="description">{{ product.description }}</p>
         <div class="price-action">
-          <span class="price">${{ product.price }}</span>
+          <span class="price">₹{{ product.price }}</span>
           <button class="btn add-to-cart" (click)="addToCart(product)">
-            🛒 Add to Cart
+            🛒 Add
           </button>
         </div>
       </div>
     </div>
   </div>
-
-  <div *ngIf="!loading && products.length === 0" class="empty-state">
-    <p>Check back soon for our new collection!</p>
+  
+  <div class="section-footer">
+    <button class="btn primary" (click)="navigateToShop()">View All Products →</button>
   </div>
 </section>
 
-<section class="categories">
-  <h2>Categories</h2>
-  <div class="category-buttons">
-    <button class="category-btn">Men</button>
-    <button class="category-btn">Women</button>
-    <button class="category-btn">Kids</button>
-    <button class="category-btn">Accessories</button>
+<!-- About VR Boutique -->
+<section class="about-intro">
+  <div class="about-content">
+    <h2>About VR Boutique</h2>
+    <p class="about-text">
+      At VR Boutique, we celebrate the beauty and elegance of Indian fashion. 
+      Our thoughtfully curated collection features traditional sarees, graceful salwar suits, 
+      festive lehengas, and stylish everyday wear that blend rich cultural heritage with modern trends.
+    </p>
+    <p class="about-text">
+      We are passionate about quality, craftsmanship, and helping every woman feel confident 
+      and beautiful. Whether for weddings, festivals, or special occasions, VR Boutique is your 
+      destination for authentic Indian style with sophistication.
+    </p>
+    <button class="btn primary" (click)="router.navigate(['/about'])">Learn More</button>
   </div>
 </section>
 
-<section class="sale-banner">
-  <h2>Winter Sale</h2>
-  <p>Up to 50% off on selected items!</p>
+<!-- Customer Testimonials -->
+<section class="testimonials">
+  <h2>What Our Customers Say</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial-card" *ngFor="let testimonial of testimonials">
+      <div class="rating">
+        <span *ngFor="let star of [1,2,3,4,5]">⭐</span>
+      </div>
+      <p class="testimonial-text">"{{ testimonial.text }}"</p>
+      <div class="testimonial-author">
+        <h4>{{ testimonial.name }}</h4>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="about-us">
-  <h2>About Us</h2>
-  <p>Brand Story & Mission</p>
+<!-- Instagram Gallery -->
+<section class="instagram-gallery">
+  <h2>Follow Us on Instagram @vrboutique</h2>
+  <div class="instagram-grid">
+    <div class="instagram-item" *ngFor="let product of featuredProducts.slice(0, 6)">
+      <img [src]="product.imageUrl" [alt]="product.name" *ngIf="product.imageUrl">
+      <div class="instagram-overlay">
+        <span>❤️ 120</span>
+        <span>💬 15</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="cta-section">
+  <div class="cta-content">
+    <h2>Ready to Discover Your Perfect Look?</h2>
+    <p>Explore our exquisite collection of Indian ethnic wear</p>
+    <button class="btn cta-button" (click)="navigateToShop()">Shop Now</button>
+  </div>
 </section>
 
 <section class="testimonials">

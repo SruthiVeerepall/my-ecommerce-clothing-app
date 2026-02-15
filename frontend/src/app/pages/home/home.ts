@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Api } from '../../services/api';
 import { CartService } from '../../services/cart.service';
 
@@ -12,17 +13,47 @@ import { CartService } from '../../services/cart.service';
 })
 export class Home implements OnInit, OnDestroy {
   products: any[] = [];
+  featuredProducts: any[] = [];
   loading = false;
   successMessage = '';
   heroProduct: any = null;
   currentHeroIndex = 0;
   carouselInterval: any;
+  
+  categories = [
+    { name: 'Sarees', icon: '🥻', image: '', count: 0 },
+    { name: 'Lehengas', icon: '👗', image: '', count: 0 },
+    { name: 'Kurties', icon: '👘', image: '', count: 0 },
+    { name: 'Kids', icon: '👶', image: '', count: 0 }
+  ];
+  
+  testimonials = [
+    {
+      name: 'Priya Sharma',
+      image: '',
+      rating: 5,
+      text: 'Amazing collection! The saree I bought for my wedding was absolutely stunning. Quality is top-notch!'
+    },
+    {
+      name: 'Anita Reddy',
+      image: '',
+      rating: 5,
+      text: 'VR Boutique has the most beautiful ethnic wear. Their customer service is excellent and delivery was fast.'
+    },
+    {
+      name: 'Meera Patel',
+      image: '',
+      rating: 5,
+      text: 'Love their lehenga collection! Perfect for festivals and special occasions. Highly recommended!'
+    }
+  ];
 
   constructor(
     private api: Api,
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
+    public router: Router
   ) {}
 
   ngOnInit() {
@@ -44,6 +75,8 @@ export class Home implements OnInit, OnDestroy {
         this.zone.run(() => {
           console.log('Home: Success! Received products:', data.length);
           this.products = data;
+          this.featuredProducts = data.slice(0, 4); // Only show 4 featured products as preview
+          this.updateCategoryCounts(data);
           this.loading = false;
           this.startCarousel();
           
@@ -60,6 +93,20 @@ export class Home implements OnInit, OnDestroy {
         });
       }
     });
+  }
+  
+  updateCategoryCounts(products: any[]) {
+    this.categories.forEach(cat => {
+      cat.count = products.filter(p => p.category === cat.name).length;
+    });
+  }
+  
+  navigateToCategory(categoryName: string) {
+    this.router.navigate(['/shop'], { queryParams: { category: categoryName } });
+  }
+  
+  navigateToShop() {
+    this.router.navigate(['/shop']);
   }
 
   // To improve performance in *ngFor
