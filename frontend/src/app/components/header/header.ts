@@ -52,8 +52,9 @@ export class Header implements OnInit {
 
   logout() {
     this.authService.logout();
+    this.cartService.clearCart();
     this.isAdmin = false;
-    this.router.navigate(['/']);
+    this.router.navigate(['/login']);
   }
 
   navigateToLogin() {

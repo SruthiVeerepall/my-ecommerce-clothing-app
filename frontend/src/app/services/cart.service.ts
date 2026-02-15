@@ -46,4 +46,8 @@ export class CartService {
     const currentCount = this.cartCountSubject.value;
     this.cartCountSubject.next(currentCount + quantity);
   }
+
+  clearCart() {
+    this.cartCountSubject.next(0);
+  }
 }

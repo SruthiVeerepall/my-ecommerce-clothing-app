@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,11 @@ export class Login {
   errorMessage = '';
   loading = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private cartService: CartService
+  ) {}
 
   onSubmit() {
     if (!this.credentials.username || !this.credentials.password) {
@@ -31,8 +36,11 @@ export class Login {
 
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
-        console.log('Login response:', response); // Debug log
-        console.log('Role stored:', localStorage.getItem('role')); // Debug log
+        console.log('Login response:', response);
+        console.log('User ID:', response.userId);
+        console.log('Role stored:', localStorage.getItem('role'));
+        // Reload cart for the newly logged-in user
+        this.cartService.loadCartCount();
         this.router.navigate(['/']);
       },
       error: (error) => {

@@ -53,11 +53,13 @@ public class AuthController {
         final String jwt = jwtUtil.generateToken(userDetails);
         
         String role = "USER";
+        Long userId = null;
         if (userDetails instanceof User) {
             role = ((User) userDetails).getRole();
+            userId = ((User) userDetails).getId();
         }
 
-        return ResponseEntity.ok(new AuthenticationResponse(jwt, role));
+        return ResponseEntity.ok(new AuthenticationResponse(jwt, role, userId));
     }
 
     @PostMapping("/register-admin")
@@ -93,10 +95,12 @@ public class AuthController {
     public static class AuthenticationResponse {
         private final String jwt;
         private final String role;
+        private final Long userId;
 
-        public AuthenticationResponse(String jwt, String role) {
+        public AuthenticationResponse(String jwt, String role, Long userId) {
             this.jwt = jwt;
             this.role = role;
+            this.userId = userId;
         }
 
         public String getJwt() {
@@ -105,6 +109,10 @@ public class AuthController {
 
         public String getRole() {
             return role;
+        }
+
+        public Long getUserId() {
+            return userId;
         }
     }
 }

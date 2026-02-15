@@ -37,9 +37,7 @@ export class AuthService {
         if (isPlatformBrowser(this.platformId)) {
           localStorage.setItem('token', response.jwt);
           localStorage.setItem('role', response.role || 'USER');
-          // Extract user ID from token or make a separate call
-          // For now, we'll use a default user ID
-          localStorage.setItem('userId', '1');
+          localStorage.setItem('userId', response.userId ? response.userId.toString() : '1');
           this.isAuthenticatedSubject.next(true);
         }
       })
