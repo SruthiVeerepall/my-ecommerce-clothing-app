@@ -27,6 +27,12 @@ public class Cart {
 
     @Column(nullable = false)
     private Integer quantity;
+    
+    @Column(name = "selected_size")
+    private String selectedSize;
+    
+    @Column(name = "selected_color")
+    private String selectedColor;
 
     // Constructors
     public Cart() {
@@ -77,5 +83,21 @@ public class Cart {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+    
+    public String getSelectedSize() {
+        return selectedSize;
+    }
+    
+    public void setSelectedSize(String selectedSize) {
+        this.selectedSize = selectedSize;
+    }
+    
+    public String getSelectedColor() {
+        return selectedColor;
+    }
+    
+    public void setSelectedColor(String selectedColor) {
+        this.selectedColor = selectedColor;
     }
 }

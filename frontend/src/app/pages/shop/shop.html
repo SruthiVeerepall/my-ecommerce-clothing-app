@@ -54,51 +54,6 @@
           </select>
         </div>
 
-        <!-- Color Filter -->
-        <div class="filter-section">
-          <label class="filter-label">Color</label>
-          <div class="color-options">
-            <button 
-              *ngFor="let color of colors" 
-              class="color-btn" 
-              [class.active]="selectedColor === color"
-              [style.background-color]="color.toLowerCase()"
-              [title]="color"
-              (click)="selectedColor = color; onFilterChange()"
-            ></button>
-            <button 
-              class="color-btn all-colors" 
-              [class.active]="selectedColor === 'all'"
-              title="All Colors"
-              (click)="selectedColor = 'all'; onFilterChange()"
-            >All</button>
-          </div>
-        </div>
-
-        <!-- Price Range Filter -->
-        <div class="filter-section">
-          <label class="filter-label">
-            Price Range: ₹{{ currentPriceRange.min }} - ₹{{ currentPriceRange.max }}
-          </label>
-          <div class="price-inputs">
-            <input 
-              type="number" 
-              class="price-input" 
-              placeholder="Min" 
-              [(ngModel)]="currentPriceRange.min"
-              (change)="onPriceRangeChange()"
-            />
-            <span>-</span>
-            <input 
-              type="number" 
-              class="price-input" 
-              placeholder="Max" 
-              [(ngModel)]="currentPriceRange.max"
-              (change)="onPriceRangeChange()"
-            />
-          </div>
-        </div>
-
         <!-- Occasion Filter -->
         <div class="filter-section">
           <label class="filter-label">Occasion</label>

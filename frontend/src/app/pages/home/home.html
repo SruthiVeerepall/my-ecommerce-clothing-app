@@ -51,7 +51,7 @@
 
   <div class="products-grid" *ngIf="!loading && featuredProducts.length > 0">
     <div class="product-card" *ngFor="let product of featuredProducts; trackBy: trackByProductId">
-      <div class="product-image-container">
+      <div class="product-image-container" (click)="viewProduct(product.id)" style="cursor: pointer;">
         <img [src]="product.imageUrl" 
              [alt]="product.name" 
              *ngIf="product.imageUrl"
@@ -60,11 +60,11 @@
         <div class="placeholder-image" *ngIf="!product.imageUrl">{{ product.name.charAt(0) }}</div>
       </div>
       <div class="product-info">
-        <h3>{{ product.name }}</h3>
+        <h3 (click)="viewProduct(product.id)" style="cursor: pointer;">{{ product.name }}</h3>
         <p class="category">{{ product.category }}</p>
         <div class="price-action">
           <span class="price">₹{{ product.price }}</span>
-          <button class="btn add-to-cart" (click)="addToCart(product)">
+          <button class="btn add-to-cart" (click)="addToCart(product); $event.stopPropagation()">
             🛒 Add
           </button>
         </div>

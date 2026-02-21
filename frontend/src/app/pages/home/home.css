@@ -221,6 +221,11 @@
   margin: 0 0 0.5rem 0;
   font-size: 1.25rem;
   color: #2d3436;
+  transition: color 0.3s ease;
+}
+
+.product-info h3:hover {
+  color: #c94b4b;
 }
 
 .product-info .category {
@@ -258,7 +263,7 @@
 
 .add-to-cart {
   padding: 0.6rem 1.2rem;
-  background: #6c5ce7;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border-radius: 8px;
   font-weight: 600;
@@ -267,11 +272,12 @@
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s;
+  border: none;
 }
 
 .add-to-cart:hover {
-  background: #5849be;
-  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
 }
 
 .loading-state, .empty-state {

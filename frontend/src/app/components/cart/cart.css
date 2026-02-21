@@ -114,7 +114,27 @@
 .item-details .category {
   color: #636e72;
   font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.product-options {
+  display: flex;
+  gap: 1rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.option-label {
+  display: inline-block;
+  background: #e9ecef;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+.option-label strong {
+  color: #2d3436;
 }
 
 .quantity-controls {

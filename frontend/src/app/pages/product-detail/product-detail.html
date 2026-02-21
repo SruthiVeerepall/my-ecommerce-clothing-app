@@ -1,11 +1,139 @@
 <div *ngIf="successMessage" class="toast success">
   {{ successMessage }}
 </div>
-<div *ngIf="loading">Loading...</div>
-<div *ngIf="!loading && product">
-  <h2>{{ product.name }}</h2>
-  <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
-  <p>{{ product.description }}</p>
-  <p>Price: ${{ product.price }}</p>
-  <button (click)="addToCart()">Add to Cart</button>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="loading-container">
+  <div class="spinner"></div>
+  <p>Loading product details...</p>
+</div>
+
+<!-- Product Detail -->
+<div *ngIf="!loading && product" class="product-detail-container">
+  <!-- Breadcrumb & Back Button -->
+  <div class="breadcrumb">
+    <button class="btn-back" (click)="goBack()">← Back to Shop</button>
+    <span class="breadcrumb-text">Home / Shop / {{ product.category }} / {{ product.name }}</span>
+  </div>
+
+  <!-- Product Main Section -->
+  <div class="product-main">
+    <!-- Product Image -->
+    <div class="product-image-section">
+      <div class="main-image">
+        <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
+        <div *ngIf="!product.imageUrl" class="no-image">No Image Available</div>
+      </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="product-info-section">
+      <div class="product-category">{{ product.category }}</div>
+      <h1 class="product-title">{{ product.name }}</h1>
+      
+      <!-- Rating -->
+      <div class="product-rating" *ngIf="product.rating">
+        <span class="stars">{{ '★'.repeat(product.rating) }}{{ '☆'.repeat(5 - product.rating) }}</span>
+        <span class="rating-text">({{ product.rating }}/5)</span>
+      </div>
+      
+      <!-- Price -->
+      <div class="product-price">
+        <span class="price">₹{{ product.price }}</span>
+        <span class="tax-info">Inclusive of all taxes</span>
+      </div>
+      
+      <!-- Description -->
+      <div class="product-description">
+        <h3>Description</h3>
+        <p>{{ product.description || 'No description available for this product.' }}</p>
+      </div>
+      
+      <!-- Size Selection -->
+      <div class="product-options" *ngIf="availableSizes.length > 0">
+        <h3>Select Size</h3>
+        <div class="size-options">
+          <button 
+            *ngFor="let size of availableSizes" 
+            class="size-btn"
+            [class.active]="selectedSize === size"
+            (click)="selectSize(size)"
+          >
+            {{ size }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Color Selection -->
+      <div class="product-options" *ngIf="availableColors.length > 0 && availableColors[0] !== 'Default'">
+        <h3>Select Color</h3>
+        <div class="color-options">
+          <button 
+            *ngFor="let color of availableColors" 
+            class="color-btn"
+            [class.active]="selectedColor === color"
+            [style.background-color]="color.toLowerCase()"
+            [title]="color"
+            (click)="selectColor(color)"
+          ></button>
+        </div>
+      </div>
+      
+      <!-- Quantity Selector -->
+      <div class="product-options">
+        <h3>Quantity</h3>
+        <div class="quantity-selector">
+          <button class="qty-btn" (click)="decrementQuantity()">−</button>
+          <input type="number" class="qty-input" [(ngModel)]="quantity" min="1" readonly />
+          <button class="qty-btn" (click)="incrementQuantity()">+</button>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="product-actions">
+        <button class="btn btn-primary btn-add-cart" (click)="addToCart()">
+          🛒 Add to Cart
+        </button>
+        <button class="btn btn-secondary" (click)="goBack()">
+          Continue Shopping
+        </button>
+      </div>
+      
+      <!-- Product Details -->
+      <div class="product-details-info">
+        <h3>Product Details</h3>
+        <ul>
+          <li><strong>Category:</strong> {{ product.category }}</li>
+          <li *ngIf="product.occasion"><strong>Occasion:</strong> {{ product.occasion }}</li>
+          <li><strong>Material:</strong> Premium Quality Fabric</li>
+          <li><strong>Care:</strong> Dry Clean Only</li>
+          <li><strong>Delivery:</strong> 5-7 Business Days</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Related Products -->
+  <div class="related-products" *ngIf="relatedProducts.length > 0">
+    <h2>You May Also Like</h2>
+    <div class="related-products-grid">
+      <div class="product-card" *ngFor="let relatedProduct of relatedProducts" (click)="viewProduct(relatedProduct.id)">
+        <div class="product-image">
+          <img [src]="relatedProduct.imageUrl" [alt]="relatedProduct.name" *ngIf="relatedProduct.imageUrl" />
+        </div>
+        <div class="product-info">
+          <h3>{{ relatedProduct.name }}</h3>
+          <p class="category">{{ relatedProduct.category }}</p>
+          <p class="price">₹{{ relatedProduct.price }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error State -->
+<div *ngIf="!loading && !product" class="error-container">
+  <h2>Product Not Found</h2>
+  <p>The product you're looking for doesn't exist.</p>
+  <button class="btn btn-primary" (click)="goBack()">Back to Shop</button>
 </div>

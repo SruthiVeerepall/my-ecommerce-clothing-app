@@ -1,8 +1,9 @@
-<div class="checkout-container">
-  <h2>Checkout</h2>
+<div class="checkout-wrapper">
+  <div class="checkout-container">
+    <h2>Checkout</h2>
 
-  <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
-    <div class="checkout-grid">
+    <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+      <div class="checkout-grid">
       <!-- User Details -->
       <div class="checkout-section">
         <h3>Personal Information</h3>
@@ -130,4 +131,5 @@
       </div>
     </div>
   </form>
+</div>
 </div>

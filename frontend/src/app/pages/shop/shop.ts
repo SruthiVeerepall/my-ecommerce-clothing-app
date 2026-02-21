@@ -34,10 +34,7 @@ export class ShopComponent implements OnInit {
   // Filter options
   selectedCategory: string = 'all';
   selectedSize: string = 'all';
-  selectedColor: string = 'all';
   selectedOccasion: string = 'all';
-  priceRange: { min: number; max: number } = { min: 0, max: 10000 };
-  currentPriceRange: { min: number; max: number } = { min: 0, max: 10000 };
   
   // Sort option
   sortBy: string = 'newest';
@@ -45,7 +42,6 @@ export class ShopComponent implements OnInit {
   // Filter lists
   categories: string[] = ['Sarees', 'Lehengas', 'Kurties', 'Kids'];
   sizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
-  colors: string[] = ['Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Purple', 'Black', 'White', 'Gold', 'Silver'];
   occasions: string[] = ['Wedding', 'Festival', 'Party', 'Casual', 'Formal', 'Traditional'];
   sortOptions = [
     { value: 'price-low', label: 'Price: Low to High' },
@@ -86,18 +82,11 @@ export class ShopComponent implements OnInit {
           ...p,
           category: p.category || this.assignRandomCategory(),
           sizes: p.sizes || this.getRandomSizes(),
-          colors: p.colors || this.getRandomColors(),
           occasion: p.occasion || this.getRandomOccasion(),
           createdAt: p.createdAt || new Date().toISOString(),
           rating: p.rating || this.getRandomRating(),
           sales: p.sales || this.getRandomSales()
         }));
-        
-        // Set price range based on actual products
-        const prices = this.allProducts.map(p => p.price);
-        this.priceRange.min = Math.min(...prices);
-        this.priceRange.max = Math.max(...prices);
-        this.currentPriceRange = { ...this.priceRange };
         
         this.filteredProducts = [...this.allProducts];
         this.applyFilters();
@@ -123,20 +112,10 @@ export class ShopComponent implements OnInit {
       filtered = filtered.filter(p => p.sizes && p.sizes.includes(this.selectedSize));
     }
     
-    // Color filter
-    if (this.selectedColor !== 'all') {
-      filtered = filtered.filter(p => p.colors && p.colors.includes(this.selectedColor));
-    }
-    
     // Occasion filter
     if (this.selectedOccasion !== 'all') {
       filtered = filtered.filter(p => p.occasion === this.selectedOccasion);
     }
-    
-    // Price range filter
-    filtered = filtered.filter(p => 
-      p.price >= this.currentPriceRange.min && p.price <= this.currentPriceRange.max
-    );
     
     // Search filter
     if (this.searchQuery.trim()) {
@@ -182,16 +161,10 @@ export class ShopComponent implements OnInit {
     this.applyFilters();
   }
 
-  onPriceRangeChange(): void {
-    this.applyFilters();
-  }
-
   clearFilters(): void {
     this.selectedCategory = 'all';
     this.selectedSize = 'all';
-    this.selectedColor = 'all';
     this.selectedOccasion = 'all';
-    this.currentPriceRange = { ...this.priceRange };
     this.searchQuery = '';
     this.sortBy = 'newest';
     this.applyFilters();
@@ -206,13 +179,15 @@ export class ShopComponent implements OnInit {
     const cartItem = {
       userId: userId,
       productId: product.id,
-      quantity: 1
+      quantity: 1,
+      selectedSize: product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Free Size',
+      selectedColor: product.colors && product.colors.length > 0 ? product.colors[0] : 'Default'
     };
     
     this.api.addToCart(cartItem).subscribe({
       next: () => {
         this.cartService.incrementCartCount(1);
-        alert('Product added to cart!');
+        alert('Product added to cart! View product details to select specific size/color.');
       },
       error: (error: any) => {
         console.error('Error adding to cart:', error);
@@ -233,11 +208,6 @@ export class ShopComponent implements OnInit {
   private getRandomSizes(): string[] {
     const count = Math.floor(Math.random() * 3) + 2;
     return this.sizes.slice(0, count);
-  }
-
-  private getRandomColors(): string[] {
-    const count = Math.floor(Math.random() * 3) + 1;
-    return this.colors.slice(0, count);
   }
 
   private getRandomOccasion(): string {

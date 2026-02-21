@@ -108,6 +108,10 @@ export class Home implements OnInit, OnDestroy {
   navigateToShop() {
     this.router.navigate(['/shop']);
   }
+  
+  viewProduct(productId: number) {
+    this.router.navigate(['/product', productId]);
+  }
 
   // To improve performance in *ngFor
   trackByProductId(index: number, product: any) {
@@ -119,7 +123,9 @@ export class Home implements OnInit, OnDestroy {
     const cartItem = {
       userId: userId,
       productId: product.id,
-      quantity: 1
+      quantity: 1,
+      selectedSize: product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Free Size',
+      selectedColor: product.colors && product.colors.length > 0 ? product.colors[0] : 'Default'
     };
 
     this.api.addToCart(cartItem).subscribe({
@@ -130,7 +136,7 @@ export class Home implements OnInit, OnDestroy {
         
         // Show success message immediately in Angular zone
         this.zone.run(() => {
-          this.successMessage = `✅ Product "${itemName}" added to cart successfully!`;
+          this.successMessage = `✅ "${itemName}" added to cart! Click product for size/color options.`;
           console.log('Success message set:', this.successMessage);
           
           // Force immediate change detection
