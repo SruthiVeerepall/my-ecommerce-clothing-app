@@ -7,7 +7,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   if (isPlatformBrowser(platformId)) {
     const token = localStorage.getItem('token');
-    if (token) {
+    const isAuthEndpoint = req.url.includes('/api/auth/');
+    if (token && !isAuthEndpoint) {
       const cloned = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)
       });

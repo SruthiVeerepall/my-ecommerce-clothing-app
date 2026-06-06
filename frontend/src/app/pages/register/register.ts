@@ -18,7 +18,7 @@ export class Register {
     confirmPassword: '',
   };
   errorMessage = '';
-  successMessage = '';
+  showSuccessModal = false;
   loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
@@ -46,18 +46,20 @@ export class Register {
 
     this.authService.register(userData).subscribe({
       next: () => {
-        this.successMessage = 'Registration successful! Redirecting to login...';
         this.loading = false;
-        // Redirect to login after showing success message
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+        this.showSuccessModal = true;
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'Registration failed';
         this.loading = false;
       },
     });
+  }
+
+  onOverlayClick(event: MouseEvent) {
+    if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+      this.navigateToLogin();
+    }
   }
 
   navigateToLogin() {

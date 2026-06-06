@@ -1,108 +1,164 @@
 # My E-commerce Clothing App
 
-This is a full-stack e-commerce application for a clothing business built using Java Spring Boot for the backend and React for the frontend.
+A full-stack e-commerce application for a clothing business, built with **Angular 21** on the frontend and **Spring Boot** on the backend, backed by a **MySQL** database and packaged with **Docker**.
+
+---
+
+## Tech Stack
+
+| Layer       | Technology                                       |
+| ----------- | ------------------------------------------------ |
+| Frontend    | Angular 21 (SSR enabled), TypeScript, RxJS       |
+| Backend     | Spring Boot 2.5, Java 11, Spring Security, JPA   |
+| Auth        | JWT (JSON Web Tokens)                            |
+| Database    | MySQL 8                                          |
+| Build Tools | Maven (backend), Angular CLI / npm (frontend)    |
+| Deployment  | Docker, Docker Compose                           |
+
+---
+
+## Features
+
+- User registration and login with JWT-based authentication
+- Role-based access control (regular user vs. admin)
+- Product browsing — Shop page, product list, and product detail views
+- Shopping cart with per-user persistence
+- Checkout flow
+- Admin dashboard for managing products and orders
+- Static informational pages (Home, About, Help)
+- Server-side rendering (SSR) for faster initial loads and better SEO
+- Responsive UI for mobile and desktop
+
+---
 
 ## Project Structure
 
 ```
-my-ecommerce-clothing-app
-├── backend                # Backend application
-│   ├── pom.xml           # Maven configuration file
-│   ├── src
-│   │   ├── main
-│   │   │   ├── java
-│   │   │   │   └── com
-│   │   │   │       └── example
-│   │   │   │           └── ecommerce
-│   │   │   │               ├── EcommerceApplication.java
-│   │   │   │               ├── controller
-│   │   │   │               │   ├── ProductController.java
-│   │   │   │               │   ├── CartController.java
-│   │   │   │               │   └── OrderController.java
-│   │   │   │               ├── model
-│   │   │   │               │   ├── Product.java
-│   │   │   │               │   ├── User.java
-│   │   │   │               │   └── Order.java
-│   │   │   │               ├── repository
-│   │   │   │               │   ├── ProductRepository.java
-│   │   │   │               │   └── OrderRepository.java
-│   │   │   │               ├── service
-│   │   │   │               │   ├── ProductService.java
-│   │   │   │               │   └── OrderService.java
-│   │   │   │               └── config
-│   │   │   │                   └── SecurityConfig.java
-│   │   │   └── resources
-│   │   │       ├── application.yml
-│   │   │       └── data.sql
-│   │   └── test
-│   │       └── java
-│   │           └── com
-│   │               └── example
-│   │                   └── ecommerce
-│   │                       └── EcommerceApplicationTests.java
-├── frontend               # Frontend application
-│   ├── package.json       # npm configuration file
-│   ├── tsconfig.json      # TypeScript configuration file
-│   ├── public
-│   │   └── index.html     # Main HTML file
-│   └── src
-│       ├── index.tsx      # Entry point for React application
-│       ├── App.tsx        # Root component
-│       ├── components
-│       │   ├── ProductList.tsx
-│       │   ├── ProductCard.tsx
-│       │   └── Cart.tsx
-│       ├── pages
-│       │   ├── Home.tsx
-│       │   ├── ProductDetail.tsx
-│       │   └── Checkout.tsx
-│       ├── services
-│       │   └── api.ts
-│       └── styles
-│           └── main.css
-├── docker                 # Docker configurations
+my-ecommerce-clothing-app/
+├── backend/                          # Spring Boot REST API
+│   ├── pom.xml
+│   └── src/main/
+│       ├── java/com/example/ecommerce/
+│       │   ├── EcommerceApplication.java
+│       │   ├── config/               # Spring Security & app configuration
+│       │   ├── controller/           # REST endpoints (Auth, Product, Cart, Order)
+│       │   ├── dto/                  # Request / response payloads
+│       │   ├── exception/            # Global exception handling
+│       │   ├── model/                # JPA entities (User, Product, Cart, Order)
+│       │   ├── repository/           # Spring Data JPA repositories
+│       │   └── service/              # Business logic + JWT utilities
+│       └── resources/
+│           ├── application.yml       # DB, server, CORS, security config
+│           └── data.sql              # Seed data
+│
+├── frontend/                         # Angular 21 application
+│   ├── angular.json
+│   ├── package.json
+│   └── src/
+│       ├── index.html
+│       ├── main.ts / main.server.ts  # Browser & SSR entry points
+│       ├── server.ts                 # Express SSR server
+│       └── app/
+│           ├── app.ts                # Root component
+│           ├── app.routes.ts         # Client-side routing
+│           ├── components/           # Reusable UI: header, footer, cart,
+│           │                         #   product-card, product-list
+│           ├── pages/                # Route-level views: home, shop, about,
+│           │                         #   help, login, register, product-detail,
+│           │                         #   checkout, admin
+│           ├── services/             # API, auth, and cart services
+│           ├── guards/               # Route guards (auth, admin)
+│           └── interceptors/         # HTTP interceptors (JWT injection)
+│
+├── docker/                           # Container setup
 │   ├── Dockerfile.backend
 │   ├── Dockerfile.frontend
 │   └── docker-compose.yml
-├── .gitignore             # Git ignore file
-├── README.md              # Project documentation
-└── LICENSE                # Licensing information
+│
+├── .gitignore
+├── LICENSE
+└── README.md
 ```
 
-## Features
-
-- User authentication and authorization
-- Product listing and detail view
-- Shopping cart functionality
-- Order management
-- Responsive design for mobile and desktop
+---
 
 ## Getting Started
 
 ### Prerequisites
 
-- Java 11 or higher
-- Node.js and npm
-- Maven
-- Docker (optional)
+- **Java 11** or higher
+- **Maven 3.6+**
+- **Node.js 18+** and **npm**
+- **MySQL 8** (running locally on port `3306`)
+- **Docker** & **Docker Compose** *(optional — only for containerized setup)*
 
-### Backend Setup
+### 1. Database Setup
 
-1. Navigate to the `backend` directory.
-2. Run `mvn clean install` to build the project.
-3. Run the application using `mvn spring-boot:run`.
+Create a MySQL database named `ecommerce_db`:
 
-### Frontend Setup
+```sql
+CREATE DATABASE ecommerce_db;
+```
 
-1. Navigate to the `frontend` directory.
-2. Run `npm install` to install dependencies.
-3. Run `npm start` to start the development server.
+Then update the credentials in [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml) to match your local MySQL setup.
 
-### Docker Setup
+> **Note:** The seed data in `data.sql` will be loaded automatically on first run.
 
-1. Navigate to the `docker` directory.
-2. Run `docker-compose up` to start the application using Docker.
+### 2. Backend Setup
+
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
+
+The API will be available at **http://localhost:8080**.
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+The app will be available at **http://localhost:4200**.
+
+### 4. Docker Setup *(Optional)*
+
+To run the full stack in containers:
+
+```bash
+cd docker
+docker-compose up --build
+```
+
+---
+
+## Available Scripts (Frontend)
+
+| Command         | Description                              |
+| --------------- | ---------------------------------------- |
+| `npm start`     | Start the dev server (`ng serve`)        |
+| `npm run build` | Build for production                     |
+| `npm run watch` | Build in watch mode (development config) |
+| `npm test`      | Run unit tests                           |
+
+---
+
+## API Overview
+
+| Endpoint Group   | Description                            |
+| ---------------- | -------------------------------------- |
+| `/api/auth/*`    | Register, login, JWT token issuance    |
+| `/api/products/*`| Product listing, detail, admin CRUD    |
+| `/api/cart/*`    | Cart operations (add, update, remove)  |
+| `/api/orders/*`  | Place and view orders                  |
+
+> See the controllers in [backend/src/main/java/com/example/ecommerce/controller/](backend/src/main/java/com/example/ecommerce/controller/) for exact routes and payloads.
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.

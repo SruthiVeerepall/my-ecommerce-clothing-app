@@ -20,12 +20,15 @@ export class Home implements OnInit, OnDestroy {
   currentHeroIndex = 0;
   carouselInterval: any;
   
-  categories = [
-    { name: 'Sarees', icon: '🥻', image: '', count: 0 },
-    { name: 'Lehengas', icon: '👗', image: '', count: 0 },
-    { name: 'Kurties', icon: '👘', image: '', count: 0 },
-    { name: 'Kids', icon: '👶', image: '', count: 0 }
-  ];
+  categories: { name: string; icon: string; image: string; count: number }[] = [];
+
+  private categoryIcons: { [key: string]: string } = {
+    'Sarees': '🥻',
+    'Lehengas': '👗',
+    'Kurties': '👘',
+    'Kids': '👶',
+    'Dresses': '👗'
+  };
   
   testimonials = [
     {
@@ -96,9 +99,19 @@ export class Home implements OnInit, OnDestroy {
   }
   
   updateCategoryCounts(products: any[]) {
-    this.categories.forEach(cat => {
-      cat.count = products.filter(p => p.category === cat.name).length;
-    });
+    const counts = new Map<string, number>();
+    for (const p of products) {
+      if (!p.category) continue;
+      counts.set(p.category, (counts.get(p.category) || 0) + 1);
+    }
+    this.categories = Array.from(counts.entries())
+      .map(([name, count]) => ({
+        name,
+        icon: this.categoryIcons[name] || '🛍️',
+        image: '',
+        count
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }
   
   navigateToCategory(categoryName: string) {

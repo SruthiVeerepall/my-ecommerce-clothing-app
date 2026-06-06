@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -40,7 +40,8 @@ export class ShopComponent implements OnInit {
   sortBy: string = 'newest';
   
   // Filter lists
-  categories: string[] = ['Sarees', 'Lehengas', 'Kurties', 'Kids'];
+  categories: string[] = [];
+  private fallbackCategories: string[] = ['Sarees', 'Lehengas', 'Kurties', 'Kids'];
   sizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
   occasions: string[] = ['Wedding', 'Festival', 'Party', 'Casual', 'Formal', 'Traditional'];
   sortOptions = [
@@ -59,52 +60,82 @@ export class ShopComponent implements OnInit {
     private api: Api,
     private cartService: CartService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.loadProducts();
-    
-    // Check for category from query params
+    // Check for category from query params first, then load products
     this.route.queryParams.subscribe(params => {
       if (params['category']) {
         this.selectedCategory = params['category'];
-        this.applyFilters();
+      }
+      // Load products after query params are processed
+      if (!this.allProducts.length) {
+        this.loadProducts();
       }
     });
   }
 
   loadProducts(): void {
     this.isLoading = true;
+    console.log('Loading products with selectedCategory:', this.selectedCategory);
+    
     this.api.getProducts().subscribe({
       next: (response: any) => {
-        this.allProducts = response.map((p: any) => ({
-          ...p,
-          category: p.category || this.assignRandomCategory(),
-          sizes: p.sizes || this.getRandomSizes(),
-          occasion: p.occasion || this.getRandomOccasion(),
-          createdAt: p.createdAt || new Date().toISOString(),
-          rating: p.rating || this.getRandomRating(),
-          sales: p.sales || this.getRandomSales()
-        }));
-        
-        this.filteredProducts = [...this.allProducts];
-        this.applyFilters();
-        this.isLoading = false;
+        this.zone.run(() => {
+          console.log('Products loaded:', response.length, 'products');
+
+          this.allProducts = response.map((p: any) => ({
+            ...p,
+            category: p.category || this.assignRandomCategory(),
+            sizes: p.sizes || this.getRandomSizes(),
+            occasion: p.occasion || this.getRandomOccasion(),
+            createdAt: p.createdAt || new Date().toISOString(),
+            rating: p.rating || this.getRandomRating(),
+            sales: p.sales || this.getRandomSales()
+          }));
+
+          // Derive the category filter list from the products that actually exist
+          this.categories = [...new Set(
+            this.allProducts.map(p => p.category).filter((c): c is string => !!c)
+          )].sort();
+
+          // If the URL requested a category that has no products, fall back to showing all
+          if (this.selectedCategory !== 'all' && !this.categories.includes(this.selectedCategory)) {
+            this.selectedCategory = 'all';
+          }
+
+          this.filteredProducts = [...this.allProducts];
+          this.applyFilters();
+          this.isLoading = false;
+
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
+
+          console.log('Filtered products:', this.filteredProducts.length);
+        });
       },
       error: (error: any) => {
-        console.error('Error loading products:', error);
-        this.isLoading = false;
+        this.zone.run(() => {
+          console.error('Error loading products:', error);
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       }
     });
   }
 
   applyFilters(): void {
+    console.log('Applying filters - selectedCategory:', this.selectedCategory);
     let filtered = [...this.allProducts];
     
     // Category filter
     if (this.selectedCategory !== 'all') {
+      console.log('Filtering by category:', this.selectedCategory);
       filtered = filtered.filter(p => p.category === this.selectedCategory);
+      console.log('Products after category filter:', filtered.length);
     }
     
     // Size filter
@@ -130,6 +161,7 @@ export class ShopComponent implements OnInit {
     this.applySorting(filtered);
     
     this.filteredProducts = filtered;
+    console.log('Final filtered products:', this.filteredProducts.length);
   }
 
   applySorting(products: Product[]): void {
@@ -202,7 +234,7 @@ export class ShopComponent implements OnInit {
 
   // Helper functions for mock data
   private assignRandomCategory(): string {
-    return this.categories[Math.floor(Math.random() * this.categories.length)];
+    return this.fallbackCategories[Math.floor(Math.random() * this.fallbackCategories.length)];
   }
 
   private getRandomSizes(): string[] {
