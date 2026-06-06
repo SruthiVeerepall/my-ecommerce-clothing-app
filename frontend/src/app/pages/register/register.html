@@ -60,14 +60,20 @@
       {{ errorMessage }}
     </div>
 
-    <div *ngIf="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
-
     <div class="login-link">
       <p>Already have an account?
         <button type="button" (click)="navigateToLogin()" class="link-btn">Login here</button>
       </p>
     </div>
+  </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" *ngIf="showSuccessModal" (click)="onOverlayClick($event)">
+  <div class="modal-box">
+    <div class="modal-icon">&#10003;</div>
+    <h3 class="modal-title">Registration Successful!</h3>
+    <p class="modal-message">Your account has been created. You can now log in.</p>
+    <button class="modal-btn" (click)="navigateToLogin()">Go to Login</button>
   </div>
 </div>

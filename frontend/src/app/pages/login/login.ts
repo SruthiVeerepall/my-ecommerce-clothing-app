@@ -18,6 +18,11 @@ export class Login {
   };
   errorMessage = '';
   loading = false;
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(
     private authService: AuthService,
