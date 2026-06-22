@@ -20,15 +20,19 @@ export class AuthService {
     }
   }
 
+  // Step 1: start registration — backend emails a verification code, no account created yet.
   register(user: { username: string; email: string; password: string }): Observable<any> {
-    return this.http.post('http://localhost:8080/api/auth/register', user).pipe(
-      tap(response => {
-        if (isPlatformBrowser(this.platformId)) {
-          // For now, after registration, redirect to login
-          // In a real app, you might want to auto-login after registration
-        }
-      })
-    );
+    return this.http.post('http://localhost:8080/api/auth/register', user);
+  }
+
+  // Step 2: submit the emailed code — backend validates it and creates the account.
+  verifyEmail(email: string, code: string): Observable<any> {
+    return this.http.post('http://localhost:8080/api/auth/verify-email', { email, code });
+  }
+
+  // Re-send a fresh verification code for a pending signup.
+  resendCode(email: string): Observable<any> {
+    return this.http.post('http://localhost:8080/api/auth/resend-code', { email });
   }
 
   login(credentials: { username: string; password: string }): Observable<any> {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,41 +17,85 @@ export class Register {
     password: '',
     confirmPassword: '',
   };
-  errorMessage = '';
-  showSuccessModal = false;
-  loading = false;
+  code = '';
+
+  errorMessage = signal('');
+  infoMessage = signal('');
+  loading = signal(false);
+  awaitingCode = signal(false);
+  showSuccessModal = signal(false);
+
+  // Email tied to the pending signup (used for verify/resend).
+  private pendingEmail = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     if (!this.user.username || !this.user.email || !this.user.password || !this.user.confirmPassword) {
-      this.errorMessage = 'Please fill in all fields';
+      this.errorMessage.set('Please fill in all fields');
       return;
     }
 
     if (this.user.password !== this.user.confirmPassword) {
-      this.errorMessage = 'Passwords do not match';
+      this.errorMessage.set('Passwords do not match');
       return;
     }
 
     if (this.user.password.length < 6) {
-      this.errorMessage = 'Password must be at least 6 characters long';
+      this.errorMessage.set('Password must be at least 6 characters long');
       return;
     }
 
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
 
     const { confirmPassword, ...userData } = this.user;
 
     this.authService.register(userData).subscribe({
-      next: () => {
-        this.loading = false;
-        this.showSuccessModal = true;
+      next: (response) => {
+        this.loading.set(false);
+        this.pendingEmail = this.user.email;
+        this.awaitingCode.set(true);
+        this.infoMessage.set(response?.message || `A verification code has been sent to ${this.user.email}.`);
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'Registration failed';
-        this.loading = false;
+        this.errorMessage.set(error.error?.message || 'Registration failed');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  onVerify() {
+    const code = this.code.trim();
+    if (!code) {
+      this.errorMessage.set('Please enter the verification code');
+      return;
+    }
+
+    this.loading.set(true);
+    this.errorMessage.set('');
+
+    this.authService.verifyEmail(this.pendingEmail, code).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.showSuccessModal.set(true);
+      },
+      error: (error) => {
+        this.errorMessage.set(error.error?.message || 'Verification failed');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  onResend() {
+    this.errorMessage.set('');
+    this.infoMessage.set('');
+    this.authService.resendCode(this.pendingEmail).subscribe({
+      next: (response) => {
+        this.infoMessage.set(response?.message || 'A new verification code has been sent.');
+      },
+      error: (error) => {
+        this.errorMessage.set(error.error?.message || 'Could not resend the code');
       },
     });
   }

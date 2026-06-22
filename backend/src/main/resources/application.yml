@@ -23,6 +23,26 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:sruthiveerepalli08@gmail.com}
+    password: ${MAIL_PASSWORD:pdab xrsy ghup qgsj}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        transport:
+          protocol: smtp
+
+# Verification code lifetime in minutes
+app:
+  verification:
+    code-expiry-minutes: 10
+    from-address: ${MAIL_USERNAME:sruthiveerepalli08@gmail.com}
 
 logging:
   level:

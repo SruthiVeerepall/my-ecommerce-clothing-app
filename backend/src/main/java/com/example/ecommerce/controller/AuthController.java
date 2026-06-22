@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.service.JwtUtil;
+import com.example.ecommerce.service.RegistrationService;
 import com.example.ecommerce.service.UserService;
 
 @RestController
@@ -27,15 +30,40 @@ public class AuthController {
     private UserService userService;
 
     @Autowired
+    private RegistrationService registrationService;
+
+    @Autowired
     private JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
         try {
-            User savedUser = userService.register(user);
-            return ResponseEntity.ok(savedUser);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Registration failed: " + e.getMessage());
+            registrationService.startRegistration(user.getUsername(), user.getEmail(), user.getPassword());
+            return ResponseEntity.ok(Map.of(
+                    "message", "A verification code has been sent to " + user.getEmail() + ".",
+                    "email", user.getEmail()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestBody Map<String, String> body) {
+        try {
+            registrationService.verifyAndCreate(body.get("email"), body.get("code"));
+            return ResponseEntity.ok(Map.of("message", "Your account has been created. You can now log in."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/resend-code")
+    public ResponseEntity<?> resendCode(@RequestBody Map<String, String> body) {
+        try {
+            registrationService.resendCode(body.get("email"));
+            return ResponseEntity.ok(Map.of("message", "A new verification code has been sent."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 

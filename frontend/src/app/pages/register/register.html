@@ -1,79 +1,117 @@
 <div class="register-container">
   <div class="register-card">
-    <h2>Create Account</h2>
+    <!-- Step 1: registration form -->
+    <ng-container *ngIf="!awaitingCode()">
+      <h2>Create Account</h2>
 
-    <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          [(ngModel)]="user.username"
-          name="username"
-          required
-          placeholder="Choose a username"
-        />
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            [(ngModel)]="user.username"
+            name="username"
+            required
+            placeholder="Choose a username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="user.email"
+            name="email"
+            required
+            placeholder="Enter your email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            [(ngModel)]="user.password"
+            name="password"
+            required
+            placeholder="Create a password"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            [(ngModel)]="user.confirmPassword"
+            name="confirmPassword"
+            required
+            placeholder="Confirm your password"
+          />
+        </div>
+
+        <button type="submit" [disabled]="loading()" class="register-btn">
+          {{ loading() ? 'Sending code...' : 'Register' }}
+        </button>
+      </form>
+
+      <div class="login-link">
+        <p>Already have an account?
+          <button type="button" (click)="navigateToLogin()" class="link-btn">Login here</button>
+        </p>
+      </div>
+    </ng-container>
+
+    <!-- Step 2: enter the emailed verification code -->
+    <ng-container *ngIf="awaitingCode()">
+      <h2>Verify Your Email</h2>
+
+      <div *ngIf="infoMessage()" class="success-message">
+        {{ infoMessage() }}
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          [(ngModel)]="user.email"
-          name="email"
-          required
-          placeholder="Enter your email"
-        />
+      <form (ngSubmit)="onVerify()">
+        <div class="form-group">
+          <label for="code">Verification Code</label>
+          <input
+            type="text"
+            id="code"
+            [(ngModel)]="code"
+            name="code"
+            inputmode="numeric"
+            maxlength="6"
+            required
+            placeholder="Enter the 6-digit code"
+          />
+        </div>
+
+        <button type="submit" [disabled]="loading()" class="register-btn">
+          {{ loading() ? 'Verifying...' : 'Verify & Create Account' }}
+        </button>
+      </form>
+
+      <div class="login-link">
+        <p>Didn't get the code?
+          <button type="button" (click)="onResend()" class="link-btn">Resend code</button>
+        </p>
       </div>
+    </ng-container>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          [(ngModel)]="user.password"
-          name="password"
-          required
-          placeholder="Create a password"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="confirmPassword">Confirm Password</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          [(ngModel)]="user.confirmPassword"
-          name="confirmPassword"
-          required
-          placeholder="Confirm your password"
-        />
-      </div>
-
-      <button type="submit" [disabled]="loading" class="register-btn">
-        {{ loading ? 'Creating Account...' : 'Register' }}
-      </button>
-    </form>
-
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
-    <div class="login-link">
-      <p>Already have an account?
-        <button type="button" (click)="navigateToLogin()" class="link-btn">Login here</button>
-      </p>
+    <div *ngIf="errorMessage()" class="error-message">
+      {{ errorMessage() }}
     </div>
   </div>
 </div>
 
 <!-- Success Modal -->
-<div class="modal-overlay" *ngIf="showSuccessModal" (click)="onOverlayClick($event)">
+<div class="modal-overlay" *ngIf="showSuccessModal()" (click)="onOverlayClick($event)">
   <div class="modal-box">
     <div class="modal-icon">&#10003;</div>
-    <h3 class="modal-title">Registration Successful!</h3>
-    <p class="modal-message">Your account has been created. You can now log in.</p>
+    <h3 class="modal-title">Account Created!</h3>
+    <p class="modal-message">Your email has been verified and your account is ready. You can now log in.</p>
     <button class="modal-btn" (click)="navigateToLogin()">Go to Login</button>
   </div>
 </div>
