@@ -23,8 +23,8 @@ export class ProductDetail implements OnInit {
   selectedColor: string = '';
   quantity: number = 1;
   
-  // Available options (will be populated from product or defaults)
-  availableSizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+  // Available options — sizes come strictly from the product the admin configured
+  availableSizes: string[] = [];
   availableColors: string[] = ['Red', 'Blue', 'Green', 'Yellow', 'Pink', 'Purple', 'Black', 'White', 'Gold', 'Silver'];
 
   constructor(
@@ -47,12 +47,13 @@ export class ProductDetail implements OnInit {
       next: (data) => {
         this.product = data;
         
-        // Set available sizes and colors from product if available
+        // Show only the sizes the admin configured for this product (none => no size selector)
         if (this.product.sizes && this.product.sizes.length > 0) {
           this.availableSizes = this.product.sizes;
           this.selectedSize = this.product.sizes[0];
         } else {
-          this.selectedSize = 'Free Size';
+          this.availableSizes = [];
+          this.selectedSize = '';
         }
         
         if (this.product.colors && this.product.colors.length > 0) {
@@ -133,7 +134,11 @@ export class ProductDetail implements OnInit {
     this.api.addToCart(cartItem).subscribe({
       next: (response) => {
         const itemName = response.product?.name || this.product.name;
-        this.successMessage = `✅ ${this.quantity} x "${itemName}" (${this.selectedSize}, ${this.selectedColor}) added to cart successfully!`;
+        const options = [this.selectedSize, this.selectedColor]
+          .filter((opt) => opt && opt !== 'Default')
+          .join(', ');
+        const optionText = options ? ` (${options})` : '';
+        this.successMessage = `✅ ${this.quantity} x "${itemName}"${optionText} added to cart successfully!`;
         this.cartService.incrementCartCount(this.quantity);
         setTimeout(() => this.successMessage = '', 4000);
       },

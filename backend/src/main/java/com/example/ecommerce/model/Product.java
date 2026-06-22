@@ -1,11 +1,17 @@
 package com.example.ecommerce.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.Lob;
+import javax.persistence.JoinColumn;
 
 @Entity
 public class Product {
@@ -28,6 +34,12 @@ public class Product {
 
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String imageUrl;
+
+    // Available sizes for this product (e.g. S, M, L, XL, Free Size)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "size")
+    private List<String> sizes = new ArrayList<>();
 
     // Constructors
     public Product() {
@@ -88,5 +100,13 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<String> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<String> sizes) {
+        this.sizes = sizes != null ? sizes : new ArrayList<>();
     }
 }

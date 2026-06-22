@@ -12,6 +12,7 @@ interface Product {
   price: number;
   category: string;
   imageUrl: string;
+  sizes: string[];
 }
 
 @Component({
@@ -30,9 +31,13 @@ export class Admin implements OnInit {
     description: '',
     price: 0,
     category: 'Dresses',
-    imageUrl: ''
+    imageUrl: '',
+    sizes: []
   };
-  
+
+  // Sizes an admin can offer for a product
+  availableSizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+
   products: Product[] = [];
   loading = false;
   loadingProducts = false;
@@ -77,6 +82,18 @@ export class Admin implements OnInit {
 
   onImageUrlChange() {
     this.imagePreview = this.product.imageUrl;
+  }
+
+  isSizeSelected(size: string): boolean {
+    return this.product.sizes.includes(size);
+  }
+
+  toggleSize(size: string) {
+    if (this.isSizeSelected(size)) {
+      this.product.sizes = this.product.sizes.filter((s) => s !== size);
+    } else {
+      this.product.sizes = [...this.product.sizes, size];
+    }
   }
 
   onFileSelected(event: any) {
@@ -199,7 +216,7 @@ export class Admin implements OnInit {
   editProduct(product: Product) {
     this.editMode = true;
     this.editingProductId = product.id;
-    this.product = { ...product };
+    this.product = { ...product, sizes: [...(product.sizes || [])] };
     this.imagePreview = product.imageUrl;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -232,7 +249,8 @@ export class Admin implements OnInit {
       description: '',
       price: 0,
       category: 'Dresses',
-      imageUrl: ''
+      imageUrl: '',
+      sizes: []
     };
     this.imagePreview = '';
     this.editMode = false;
