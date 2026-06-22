@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,8 +16,8 @@ export class Login {
     username: '',
     password: '',
   };
-  errorMessage = '';
-  loading = false;
+  errorMessage = signal('');
+  loading = signal(false);
   showPassword = false;
 
   togglePasswordVisibility() {
@@ -32,25 +32,31 @@ export class Login {
 
   onSubmit() {
     if (!this.credentials.username || !this.credentials.password) {
-      this.errorMessage = 'Please fill in all fields';
+      this.errorMessage.set('Please fill in all fields');
       return;
     }
 
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
 
     this.authService.login(this.credentials).subscribe({
-      next: (response) => {
-        console.log('Login response:', response);
-        console.log('User ID:', response.userId);
-        console.log('Role stored:', localStorage.getItem('role'));
+      next: () => {
         // Reload cart for the newly logged-in user
         this.cartService.loadCartCount();
         this.router.navigate(['/']);
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'Login failed';
-        this.loading = false;
+        const body = error.error;
+        if (body?.message) {
+          this.errorMessage.set(body.message);
+        } else if (typeof body === 'string' && body) {
+          this.errorMessage.set(body);
+        } else if (error.status === 401 || error.status === 400) {
+          this.errorMessage.set('Incorrect username or password');
+        } else {
+          this.errorMessage.set('Login failed. Please try again.');
+        }
+        this.loading.set(false);
       },
     });
   }

@@ -66,13 +66,13 @@
         </div>
       </div>
 
-      <button type="submit" [disabled]="loading" class="login-btn">
-        {{ loading ? 'Logging in...' : 'Login' }}
+      <button type="submit" [disabled]="loading()" class="login-btn">
+        {{ loading() ? 'Logging in...' : 'Login' }}
       </button>
     </form>
 
-    <div *ngIf="errorMessage" class="error-message">
-      {{ errorMessage }}
+    <div *ngIf="errorMessage()" class="error-message">
+      {{ errorMessage() }}
     </div>
 
     <div class="register-link">
