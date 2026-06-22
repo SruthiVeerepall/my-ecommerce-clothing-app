@@ -33,7 +33,7 @@
             [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
           >
             <svg
-              *ngIf="!showPassword"
+              *ngIf="showPassword"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
@@ -48,7 +48,7 @@
               <circle cx="12" cy="12" r="3"></circle>
             </svg>
             <svg
-              *ngIf="showPassword"
+              *ngIf="!showPassword"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"

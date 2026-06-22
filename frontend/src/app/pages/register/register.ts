@@ -19,6 +19,9 @@ export class Register {
   };
   code = '';
 
+  showPassword = false;
+  showConfirmPassword = false;
+
   errorMessage = signal('');
   infoMessage = signal('');
   loading = signal(false);
@@ -29,6 +32,14 @@ export class Register {
   private pendingEmail = '';
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
   onSubmit() {
     if (!this.user.username || !this.user.email || !this.user.password || !this.user.confirmPassword) {
