@@ -16,6 +16,7 @@ import java.util.Map;
 
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.service.JwtUtil;
+import com.example.ecommerce.service.PasswordResetService;
 import com.example.ecommerce.service.RegistrationService;
 import com.example.ecommerce.service.UserService;
 
@@ -31,6 +32,9 @@ public class AuthController {
 
     @Autowired
     private RegistrationService registrationService;
+
+    @Autowired
+    private PasswordResetService passwordResetService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -62,6 +66,28 @@ public class AuthController {
         try {
             registrationService.resendCode(body.get("email"));
             return ResponseEntity.ok(Map.of("message", "A new verification code has been sent."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
+        try {
+            passwordResetService.requestReset(body.get("email"));
+            // Always generic to avoid revealing whether the email is registered.
+            return ResponseEntity.ok(Map.of(
+                    "message", "If an account exists for that email, a reset code has been sent."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+        try {
+            passwordResetService.resetPassword(body.get("email"), body.get("code"), body.get("password"));
+            return ResponseEntity.ok(Map.of("message", "Your password has been reset. You can now log in."));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }

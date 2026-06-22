@@ -5,6 +5,7 @@ import { ProductDetail } from './pages/product-detail/product-detail';
 import { Checkout } from './pages/checkout/checkout';
 import { Login } from './pages/login/login';
 import { Register } from './pages/register/register';
+import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { Admin } from './pages/admin/admin';
 import { About } from './pages/about/about';
 import { Help } from './pages/help/help';
@@ -15,6 +16,7 @@ import { AdminGuard } from './guards/admin.guard';
 export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'register', component: Register },
+  { path: 'forgot-password', component: ForgotPassword },
   { path: '', component: Home, canActivate: [AuthGuard] },
   { path: 'shop', component: ShopComponent, canActivate: [AuthGuard] },
   { path: 'about', component: About, canActivate: [AuthGuard] },

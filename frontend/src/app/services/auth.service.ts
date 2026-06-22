@@ -35,6 +35,16 @@ export class AuthService {
     return this.http.post('http://localhost:8080/api/auth/resend-code', { email });
   }
 
+  // Forgot password: request a reset code by email.
+  requestPasswordReset(email: string): Observable<any> {
+    return this.http.post('http://localhost:8080/api/auth/forgot-password', { email });
+  }
+
+  // Forgot password: submit the code + new password to reset.
+  resetPassword(email: string, code: string, password: string): Observable<any> {
+    return this.http.post('http://localhost:8080/api/auth/reset-password', { email, code, password });
+  }
+
   login(credentials: { username: string; password: string }): Observable<any> {
     return this.http.post('http://localhost:8080/api/auth/login', credentials).pipe(
       tap((response: any) => {
