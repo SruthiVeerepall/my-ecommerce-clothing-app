@@ -55,18 +55,20 @@ export class Checkout implements OnInit {
   }
 
   detectCardType(number: string) {
-    if (!number) {
+    const digits = (number || '').replace(/\D/g, '');
+
+    if (!digits || digits.length < 4) {
       this.detectedCardType = '';
       return;
     }
 
-    if (number.startsWith('4')) {
+    if (digits.startsWith('4')) {
       this.detectedCardType = 'Visa';
-    } else if (/^5[1-5]/.test(number) || /^2[2-7]/.test(number)) {
+    } else if (/^5[1-5]/.test(digits) || /^2[2-7]/.test(digits)) {
       this.detectedCardType = 'Mastercard';
-    } else if (/^3[47]/.test(number)) {
+    } else if (/^3[47]/.test(digits)) {
       this.detectedCardType = 'American Express';
-    } else if (/^6(?:011|5|4|22)/.test(number)) {
+    } else if (/^6(?:011|5|4|22)/.test(digits)) {
       this.detectedCardType = 'Discover';
     } else {
       this.detectedCardType = 'Unknown';
