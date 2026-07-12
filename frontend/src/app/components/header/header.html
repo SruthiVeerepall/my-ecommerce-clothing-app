@@ -18,7 +18,18 @@
       🛒
       <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
     </button>
-    <button class="btn" *ngIf="!isAuthenticated" (click)="navigateToLogin()">[Login]</button>
-    <button class="btn" *ngIf="isAuthenticated" (click)="logout()">Logout</button>
+    <button class="btn auth-btn" *ngIf="!isAuthenticated" (click)="navigateToLogin()" title="Login">
+      <span class="auth-icon" aria-hidden="true">🔐</span>
+    </button>
+    <button class="btn auth-btn" *ngIf="isAuthenticated" (click)="logout()" title="Logout">
+      <span class="auth-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"></path>
+          <path d="M16 7l4 5-4 5"></path>
+          <path d="M20 12H9"></path>
+          <path d="M13 4.5a1.5 1.5 0 0 1 0 3"></path>
+        </svg>
+      </span>
+    </button>
   </div>
 </header>

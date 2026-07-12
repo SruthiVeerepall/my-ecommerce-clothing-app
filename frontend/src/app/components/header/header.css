@@ -82,6 +82,30 @@
   background: #fff;
   cursor: pointer;
 }
+
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0.5rem;
+  border-radius: 50%;
+  font-size: 1.1rem;
+}
+
+.auth-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-icon svg {
+  width: 18px;
+  height: 18px;
+  color: #333;
+}
+
 .admin-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
