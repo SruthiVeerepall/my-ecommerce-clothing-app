@@ -2,6 +2,7 @@ import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
@@ -9,14 +10,24 @@ import { isPlatformBrowser } from '@angular/common';
 export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  private inactivityTimer: number | null = null;
+  private readonly inactivityTimeoutMs = 20 * 60 * 1000;
+  private readonly activityEvents = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart', 'touchmove', 'pointerdown'];
+  private readonly handleActivity = () => {
+    this.resetInactivityTimer();
+  };
 
   constructor(
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private router: Router
   ) {
     if (isPlatformBrowser(this.platformId)) {
       const token = localStorage.getItem('token');
       this.isAuthenticatedSubject.next(!!token);
+      if (token) {
+        this.startInactivityTimer();
+      }
     }
   }
 
@@ -53,6 +64,7 @@ export class AuthService {
           localStorage.setItem('role', response.role || 'USER');
           localStorage.setItem('userId', response.userId ? response.userId.toString() : '1');
           this.isAuthenticatedSubject.next(true);
+          this.startInactivityTimer();
         }
       })
     );
@@ -60,10 +72,57 @@ export class AuthService {
 
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
+      this.clearInactivityTimer();
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       localStorage.removeItem('role');
       this.isAuthenticatedSubject.next(false);
+    }
+  }
+
+  private startInactivityTimer(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    this.clearInactivityTimer();
+
+    this.activityEvents.forEach((event) => {
+      document.addEventListener(event, this.handleActivity, true);
+    });
+
+    this.resetInactivityTimer();
+  }
+
+  private resetInactivityTimer(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.isAuthenticatedSubject.value) {
+      return;
+    }
+
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+    }
+
+    this.inactivityTimer = window.setTimeout(() => {
+      this.expireSession();
+    }, this.inactivityTimeoutMs);
+  }
+
+  private clearInactivityTimer(): void {
+    if (this.inactivityTimer) {
+      clearTimeout(this.inactivityTimer);
+      this.inactivityTimer = null;
+    }
+
+    this.activityEvents.forEach((event) => {
+      document.removeEventListener(event, this.handleActivity, true);
+    });
+  }
+
+  private expireSession(): void {
+    this.logout();
+    if (this.router.url !== '/login') {
+      this.router.navigate(['/login']);
     }
   }
 
