@@ -35,8 +35,13 @@ public class Product {
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String imageUrl;
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "product_image_urls", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url", columnDefinition = "LONGTEXT")
+    private List<String> imageUrls = new ArrayList<>();
+
     // Available sizes for this product (e.g. S, M, L, XL, Free Size)
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "product_sizes", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "size")
     private List<String> sizes = new ArrayList<>();
@@ -100,6 +105,14 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls != null ? imageUrls : new ArrayList<>();
     }
 
     public List<String> getSizes() {

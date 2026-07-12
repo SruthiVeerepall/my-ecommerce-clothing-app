@@ -12,6 +12,7 @@ interface Product {
   price: number;
   category: string;
   imageUrl: string;
+  imageUrls: string[];
   sizes: string[];
 }
 
@@ -32,10 +33,10 @@ export class Admin implements OnInit {
     price: 0,
     category: 'Dresses',
     imageUrl: '',
+    imageUrls: [],
     sizes: []
   };
 
-  // Sizes an admin can offer for a product
   availableSizes: string[] = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
 
   products: Product[] = [];
@@ -44,6 +45,7 @@ export class Admin implements OnInit {
   successMessage = '';
   errorMessage = '';
   imagePreview = '';
+  selectedImageIndex = 0;
   editMode = false;
   editingProductId?: number;
 
@@ -53,20 +55,32 @@ export class Admin implements OnInit {
     this.loadProducts();
   }
 
+  private normalizeProductImages(product: Product): Product {
+    const imageUrls = Array.isArray((product as any).imageUrls)
+      ? (product as any).imageUrls.filter((image: string | null | undefined) => !!image)
+      : [];
+
+    return {
+      ...product,
+      imageUrls: imageUrls.length > 0 ? imageUrls : (product.imageUrl ? [product.imageUrl] : []),
+      imageUrl: product.imageUrl || (imageUrls[0] || '')
+    };
+  }
+
+  getProductImages(product: Product): string[] {
+    return this.normalizeProductImages(product).imageUrls;
+  }
+
   loadProducts() {
     this.loadingProducts = true;
-    console.log('Loading products...');
     this.api.getProducts().subscribe({
       next: (data) => {
-        console.log('Products loaded successfully:', data.length, 'products');
-        this.products = data;
+        this.products = data.map((item: any) => this.normalizeProductImages(item));
         this.loadingProducts = false;
-        // Scroll to products section to show the new product
         setTimeout(() => {
           const productsSection = document.querySelector('.products-section');
           if (productsSection) {
             productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            console.log('Scrolled to products section');
           }
         }, 300);
       },
@@ -74,14 +88,15 @@ export class Admin implements OnInit {
         console.error('Error loading products:', err);
         this.loadingProducts = false;
         this.errorMessage = 'Failed to load products. Retrying...';
-        // Retry loading products after 2 seconds
         setTimeout(() => this.loadProducts(), 2000);
       }
     });
   }
 
   onImageUrlChange() {
+    this.product.imageUrls = this.product.imageUrl ? [this.product.imageUrl] : [];
     this.imagePreview = this.product.imageUrl;
+    this.selectedImageIndex = 0;
   }
 
   isSizeSelected(size: string): boolean {
@@ -97,23 +112,27 @@ export class Admin implements OnInit {
   }
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        this.errorMessage = 'Please select a valid image file';
-        return;
-      }
+    const selectedFiles = Array.from(event.target.files || []) as File[];
+    const files = selectedFiles.filter((file): file is File => file instanceof File);
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        this.errorMessage = 'Image size should be less than 5MB';
-        return;
-      }
-
-      // Compress and convert image to base64
-      this.compressImage(file);
+    if (!files.length) {
+      return;
     }
+
+    const invalidFiles = files.filter((file) => !file.type.startsWith('image/'));
+    if (invalidFiles.length) {
+      this.errorMessage = 'Please select valid image files';
+      return;
+    }
+
+    const oversizedFiles = files.filter((file) => file.size > 5 * 1024 * 1024);
+    if (oversizedFiles.length) {
+      this.errorMessage = 'Each image should be less than 5MB';
+      return;
+    }
+
+    this.errorMessage = '';
+    files.forEach((file) => this.compressImage(file));
   }
 
   compressImage(file: File) {
@@ -121,15 +140,13 @@ export class Admin implements OnInit {
     reader.onload = (e: any) => {
       const img = new Image();
       img.onload = () => {
-        // Create canvas for compression
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
-        
-        // Calculate new dimensions (max 800x800)
+
         let width = img.width;
         let height = img.height;
         const maxSize = 800;
-        
+
         if (width > height && width > maxSize) {
           height = (height * maxSize) / width;
           width = maxSize;
@@ -137,19 +154,16 @@ export class Admin implements OnInit {
           width = (width * maxSize) / height;
           height = maxSize;
         }
-        
+
         canvas.width = width;
         canvas.height = height;
-        
-        // Draw and compress image
         ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convert to base64 with quality reduction (0.7 = 70% quality)
+
         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-        
-        console.log('Image compressed. New size approx:', Math.round(compressedBase64.length / 1024), 'KB');
+        this.product.imageUrls = [...this.product.imageUrls, compressedBase64];
         this.product.imageUrl = compressedBase64;
         this.imagePreview = compressedBase64;
+        this.selectedImageIndex = this.product.imageUrls.length - 1;
         this.errorMessage = '';
       };
       img.src = e.target.result;
@@ -160,28 +174,52 @@ export class Admin implements OnInit {
     reader.readAsDataURL(file);
   }
 
-  removeImage() {
+  selectImage(index: number) {
+    this.selectedImageIndex = index;
+    this.imagePreview = this.product.imageUrls[index] || '';
+    this.product.imageUrl = this.imagePreview;
+  }
+
+  removeImage(index?: number) {
+    if (typeof index === 'number') {
+      this.product.imageUrls.splice(index, 1);
+      if (this.product.imageUrls.length === 0) {
+        this.product.imageUrl = '';
+        this.imagePreview = '';
+        this.selectedImageIndex = 0;
+      } else {
+        const nextIndex = Math.min(index, this.product.imageUrls.length - 1);
+        this.selectedImageIndex = nextIndex;
+        this.imagePreview = this.product.imageUrls[nextIndex];
+        this.product.imageUrl = this.imagePreview;
+      }
+      return;
+    }
+
+    this.product.imageUrls = [];
     this.product.imageUrl = '';
     this.imagePreview = '';
+    this.selectedImageIndex = 0;
   }
 
   onSubmit() {
     this.loading = true;
     this.successMessage = '';
     this.errorMessage = '';
-    
-    console.log('Sending product data...', { ...this.product, imageUrl: this.product.imageUrl?.substring(0, 50) + '...' });
 
-    const productData = { ...this.product };
+    const productData = {
+      ...this.product,
+      imageUrl: this.product.imageUrls[0] || this.product.imageUrl,
+      imageUrls: this.product.imageUrls.length > 0 ? this.product.imageUrls : (this.product.imageUrl ? [this.product.imageUrl] : [])
+    };
 
     if (this.editMode && this.editingProductId) {
-      // Update existing product
       this.api.updateProduct(this.editingProductId, productData)
         .pipe(finalize(() => {
           this.loading = false;
         }))
         .subscribe({
-          next: (response) => {
+          next: () => {
             this.successMessage = '✅ Product updated successfully!';
             this.resetForm();
             this.loadProducts();
@@ -193,13 +231,12 @@ export class Admin implements OnInit {
           }
         });
     } else {
-      // Create new product
       this.api.createProduct(productData)
         .pipe(finalize(() => {
           this.loading = false;
         }))
         .subscribe({
-          next: (response) => {
+          next: () => {
             this.successMessage = '✅ Product added successfully!';
             this.resetForm();
             this.loadProducts();
@@ -216,8 +253,12 @@ export class Admin implements OnInit {
   editProduct(product: Product) {
     this.editMode = true;
     this.editingProductId = product.id;
-    this.product = { ...product, sizes: [...(product.sizes || [])] };
-    this.imagePreview = product.imageUrl;
+    this.product = {
+      ...this.normalizeProductImages(product),
+      sizes: [...(product.sizes || [])]
+    };
+    this.imagePreview = this.product.imageUrls[0] || this.product.imageUrl;
+    this.selectedImageIndex = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -243,20 +284,21 @@ export class Admin implements OnInit {
         category: 'Dresses'
       });
     }
-    
+
     this.product = {
       name: '',
       description: '',
       price: 0,
       category: 'Dresses',
       imageUrl: '',
+      imageUrls: [],
       sizes: []
     };
     this.imagePreview = '';
+    this.selectedImageIndex = 0;
     this.editMode = false;
     this.editingProductId = undefined;
-    
-    // Clear the file input element manually
+
     if (this.fileInput && this.fileInput.nativeElement) {
       this.fileInput.nativeElement.value = '';
     }

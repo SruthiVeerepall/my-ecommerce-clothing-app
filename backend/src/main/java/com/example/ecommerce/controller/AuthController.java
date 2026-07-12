@@ -101,7 +101,7 @@ public class AuthController {
                     new UsernamePasswordAuthenticationToken(identifier, user.getPassword()));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(401)
-                    .body(java.util.Map.of("message", "Incorrect username or password"));
+                    .body(java.util.Map.of("message", "Incorrect email or password"));
         }
 
         final UserDetails userDetails = userService.loadUserByUsername(identifier);

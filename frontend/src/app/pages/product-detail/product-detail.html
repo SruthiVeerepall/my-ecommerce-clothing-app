@@ -2,84 +2,88 @@
   {{ successMessage }}
 </div>
 
-<!-- Loading State -->
 <div *ngIf="loading" class="loading-container">
   <div class="spinner"></div>
   <p>Loading product details...</p>
 </div>
 
-<!-- Product Detail -->
 <div *ngIf="!loading && product" class="product-detail-container">
-  <!-- Breadcrumb & Back Button -->
   <div class="breadcrumb">
     <button class="btn-back" (click)="goBack()">← Back to Shop</button>
     <span class="breadcrumb-text">Home / Shop / {{ product.category }} / {{ product.name }}</span>
   </div>
 
-  <!-- Product Main Section -->
   <div class="product-main">
-    <!-- Product Image -->
     <div class="product-image-section">
-      <div class="main-image">
-        <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
-        <div *ngIf="!product.imageUrl" class="no-image">No Image Available</div>
+      <div class="image-gallery" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+        <div class="main-image">
+          <img *ngIf="getProductImages().length > 0" [src]="getProductImages()[currentImageIndex]" [alt]="product.name" />
+          <div *ngIf="getProductImages().length === 0" class="no-image">No Image Available</div>
+        </div>
+
+        <div class="gallery-controls" *ngIf="getProductImages().length > 1">
+          <button class="gallery-nav" (click)="prevImage()">‹</button>
+          <div class="gallery-dots">
+            <button
+              *ngFor="let image of getProductImages(); let i = index"
+              class="dot"
+              [class.active]="i === currentImageIndex"
+              (click)="selectImage(i)">
+            </button>
+          </div>
+          <button class="gallery-nav" (click)="nextImage()">›</button>
+        </div>
+
+        <p class="swipe-hint" *ngIf="getProductImages().length > 1">Swipe to view more photos</p>
       </div>
     </div>
 
-    <!-- Product Info -->
     <div class="product-info-section">
       <div class="product-category">{{ product.category }}</div>
       <h1 class="product-title">{{ product.name }}</h1>
-      
-      <!-- Rating -->
+
       <div class="product-rating" *ngIf="product.rating">
         <span class="stars">{{ '★'.repeat(product.rating) }}{{ '☆'.repeat(5 - product.rating) }}</span>
         <span class="rating-text">({{ product.rating }}/5)</span>
       </div>
-      
-      <!-- Price -->
+
       <div class="product-price">
         <span class="price">₹{{ product.price }}</span>
         <span class="tax-info">Inclusive of all taxes</span>
       </div>
-      
-      <!-- Description -->
+
       <div class="product-description">
         <h3>Description</h3>
         <p>{{ product.description || 'No description available for this product.' }}</p>
       </div>
-      
-      <!-- Size Selection -->
+
       <div class="product-options" *ngIf="availableSizes.length > 0">
         <h3>Select Size</h3>
         <div class="size-options">
-          <button 
-            *ngFor="let size of availableSizes" 
+          <button
+            *ngFor="let size of availableSizes"
             class="size-btn"
             [class.active]="selectedSize === size"
-            (click)="selectSize(size)"
-          >
+            (click)="selectSize(size)">
             {{ size }}
           </button>
         </div>
       </div>
-      
-      <!-- Color Selection -->
+
       <div class="product-options" *ngIf="availableColors.length > 0 && availableColors[0] !== 'Default'">
         <h3>Select Color</h3>
         <div class="color-options">
-          <button 
-            *ngFor="let color of availableColors" 
+          <button
+            *ngFor="let color of availableColors"
             class="color-btn"
             [class.active]="selectedColor === color"
             [style.background-color]="color.toLowerCase()"
             [title]="color"
-            (click)="selectColor(color)"
-          ></button>
+            (click)="selectColor(color)">
+          </button>
         </div>
       </div>
-      
-      <!-- Quantity Selector -->
+
       <div class="product-options">
         <h3>Quantity</h3>
         <div class="quantity-selector">
@@ -88,8 +92,7 @@
           <button class="qty-btn" (click)="incrementQuantity()">+</button>
         </div>
       </div>
-      
-      <!-- Action Buttons -->
+
       <div class="product-actions">
         <button class="btn btn-primary btn-add-cart" (click)="addToCart()">
           🛒 Add to Cart
@@ -98,8 +101,7 @@
           Continue Shopping
         </button>
       </div>
-      
-      <!-- Product Details -->
+
       <div class="product-details-info">
         <h3>Product Details</h3>
         <ul>
@@ -112,14 +114,13 @@
       </div>
     </div>
   </div>
-  
-  <!-- Related Products -->
+
   <div class="related-products" *ngIf="relatedProducts.length > 0">
     <h2>You May Also Like</h2>
     <div class="related-products-grid">
       <div class="product-card" *ngFor="let relatedProduct of relatedProducts" (click)="viewProduct(relatedProduct.id)">
         <div class="product-image">
-          <img [src]="relatedProduct.imageUrl" [alt]="relatedProduct.name" *ngIf="relatedProduct.imageUrl" />
+          <img [src]="getProductImages(relatedProduct)[0]" [alt]="relatedProduct.name" *ngIf="getProductImages(relatedProduct).length > 0" />
         </div>
         <div class="product-info">
           <h3>{{ relatedProduct.name }}</h3>
@@ -131,7 +132,6 @@
   </div>
 </div>
 
-<!-- Error State -->
 <div *ngIf="!loading && !product" class="error-container">
   <h2>Product Not Found</h2>
   <p>The product you're looking for doesn't exist.</p>

@@ -5,20 +5,19 @@
   </div>
 
   <div class="admin-content">
-    <!-- Add/Edit Product Form -->
     <div class="form-section">
       <h2>{{ editMode ? 'Edit Product' : 'Add New Product' }}</h2>
-      
+
       <form (ngSubmit)="onSubmit()" #productForm="ngForm" class="admin-form">
         <div class="form-row">
           <div class="form-group">
             <label for="name">Product Name *</label>
-            <input 
-              type="text" 
-              id="name" 
-              name="name" 
-              [(ngModel)]="product.name" 
-              required 
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="product.name"
+              required
               placeholder="e.g., Red Floral Dress">
           </div>
 
@@ -35,24 +34,24 @@
 
         <div class="form-group">
           <label for="description">Description *</label>
-          <textarea 
-            id="description" 
-            name="description" 
-            [(ngModel)]="product.description" 
-            required 
+          <textarea
+            id="description"
+            name="description"
+            [(ngModel)]="product.description"
+            required
             rows="3"
             placeholder="Enter product description..."></textarea>
         </div>
 
         <div class="form-group">
           <label for="price">Price ($) *</label>
-          <input 
-            type="number" 
-            id="price" 
-            name="price" 
-            [(ngModel)]="product.price" 
-            required 
-            min="0" 
+          <input
+            type="number"
+            id="price"
+            name="price"
+            [(ngModel)]="product.price"
+            required
+            min="0"
             step="0.01"
             placeholder="0.00">
         </div>
@@ -73,37 +72,46 @@
         </div>
 
         <div class="form-group">
-          <label for="imageFile">Product Image *</label>
+          <label for="imageFile">Product Images *</label>
           <div class="file-upload-container">
-            <input 
-              type="file" 
-              id="imageFile" 
-              name="imageFile" 
+            <input
+              type="file"
+              id="imageFile"
+              name="imageFile"
               accept="image/*"
+              multiple
               (change)="onFileSelected($event)"
               class="file-input"
               #fileInput>
             <button type="button" class="btn-upload" (click)="fileInput.click()">
-              📁 Choose Image from Device
+              📁 Choose Images
             </button>
-            <span class="file-name" *ngIf="imagePreview">Image selected ✓</span>
+            <span class="file-name" *ngIf="product.imageUrls.length > 0">{{ product.imageUrls.length }} image(s) selected ✓</span>
           </div>
-          <small class="hint">💡 Supported formats: JPG, PNG, WEBP. Max size: 5MB</small>
+          <small class="hint">💡 Add several photos so customers can swipe through them on the product page.</small>
         </div>
 
-        <!-- Image Preview -->
-        <div class="image-preview-section" *ngIf="imagePreview">
-          <label>Image Preview:</label>
+        <div class="image-preview-section" *ngIf="product.imageUrls.length > 0">
+          <label>Gallery Preview:</label>
+          <div class="image-thumbnails">
+            <div
+              class="image-thumb"
+              *ngFor="let image of product.imageUrls; let i = index"
+              [class.active]="i === selectedImageIndex"
+              (click)="selectImage(i)">
+              <img [src]="image" [alt]="product.name || 'Preview'">
+              <button type="button" class="btn-remove-image" (click)="removeImage(i); $event.stopPropagation()" title="Remove image">
+                ✕
+              </button>
+            </div>
+          </div>
           <div class="image-preview">
             <img [src]="imagePreview" [alt]="product.name || 'Preview'">
-            <button type="button" class="btn-remove-image" (click)="removeImage()" title="Remove image">
-              ✕
-            </button>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" [disabled]="loading || !productForm.form.valid || (!product.imageUrl && products.length > 0)" class="btn btn-primary">
+          <button type="submit" [disabled]="loading || !productForm.form.valid || product.imageUrls.length === 0" class="btn btn-primary">
             {{ loading ? 'Saving...' : (editMode ? 'Update Product' : 'Add Product') }}
           </button>
           <button type="button" *ngIf="editMode" (click)="resetForm()" class="btn btn-secondary">
@@ -120,16 +128,15 @@
       </div>
     </div>
 
-    <!-- Products List -->
     <div class="products-section">
       <h2>📦 All Products ({{ products.length }})</h2>
-      
+
       <div *ngIf="loadingProducts" class="loading">Loading products...</div>
-      
+
       <div class="products-grid" *ngIf="!loadingProducts">
         <div class="product-item" *ngFor="let p of products">
           <div class="product-image">
-            <img [src]="p.imageUrl" [alt]="p.name" (error)="$event.target.src = '/assets/placeholder.png'">
+            <img [src]="getProductImages(p)[0] || '/assets/placeholder.png'" [alt]="p.name" (error)="$event.target.src = '/assets/placeholder.png'">
           </div>
           <div class="product-info">
             <h3>{{ p.name }}</h3>
@@ -139,6 +146,7 @@
             <div class="sizes-list" *ngIf="p.sizes && p.sizes.length > 0">
               <span class="size-badge" *ngFor="let s of p.sizes">{{ s }}</span>
             </div>
+            <span class="photo-count" *ngIf="getProductImages(p).length > 1">{{ getProductImages(p).length }} photos</span>
           </div>
           <div class="product-actions">
             <button class="btn-edit" (click)="editProduct(p)">✏️ Edit</button>

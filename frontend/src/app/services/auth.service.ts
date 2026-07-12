@@ -45,7 +45,7 @@ export class AuthService {
     return this.http.post('http://localhost:8080/api/auth/reset-password', { email, code, password });
   }
 
-  login(credentials: { username: string; password: string }): Observable<any> {
+  login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post('http://localhost:8080/api/auth/login', credentials).pipe(
       tap((response: any) => {
         if (isPlatformBrowser(this.platformId)) {

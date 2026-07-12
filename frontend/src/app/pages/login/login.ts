@@ -13,7 +13,7 @@ import { CartService } from '../../services/cart.service';
 })
 export class Login {
   credentials = {
-    username: '',
+    email: '',
     password: '',
   };
   errorMessage = signal('');
@@ -31,7 +31,7 @@ export class Login {
   ) {}
 
   onSubmit() {
-    if (!this.credentials.username || !this.credentials.password) {
+    if (!this.credentials.email || !this.credentials.password) {
       this.errorMessage.set('Please fill in all fields');
       return;
     }
@@ -52,7 +52,7 @@ export class Login {
         } else if (typeof body === 'string' && body) {
           this.errorMessage.set(body);
         } else if (error.status === 401 || error.status === 400) {
-          this.errorMessage.set('Incorrect username or password');
+          this.errorMessage.set('Incorrect email or password');
         } else {
           this.errorMessage.set('Login failed. Please try again.');
         }
